@@ -4,15 +4,28 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  useFonts,
+  Heebo_400Regular,
+  Heebo_500Medium,
+  Heebo_700Bold,
+  Heebo_800ExtraBold,
+} from '@expo-google-fonts/heebo';
 import { AppStateProvider, useAppState } from '../src/state/AppStateContext';
-import { colors } from '../src/theme';
+import { colors, layout } from '../src/theme';
 
 const Gate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { ready } = useAppState();
-  if (!ready) {
+  const [fontsLoaded] = useFonts({
+    Heebo_400Regular,
+    Heebo_500Medium,
+    Heebo_700Bold,
+    Heebo_800ExtraBold,
+  });
+  if (!ready || !fontsLoaded) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color={colors.turquoise} />
+        <ActivityIndicator size="large" color={colors.lotusPink} />
       </View>
     );
   }
@@ -51,7 +64,7 @@ const styles = StyleSheet.create({
   shell: {
     flex: 1,
     width: '100%',
-    maxWidth: 600,
+    maxWidth: layout.maxContentWidth,
     alignSelf: 'center',
     backgroundColor: colors.cream,
   },

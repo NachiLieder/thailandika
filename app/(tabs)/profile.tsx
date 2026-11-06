@@ -1,49 +1,49 @@
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppButton, Card, FadeIn, HeText, Pill, ProgressBar, SectionTitle } from '../../src/components/ui';
-import { CategoryIcon } from '../../src/components/CategoryIcon';
-import { Avatar, TropicalScene } from '../../src/components/Scenery';
-import { CATEGORIES } from '../../src/data/categories';
-import { QUESTIONS_PER_QUIZ } from '../../src/data/questions';
-import { categoryPalette, colors, he, radius, shadow, spacing, typography } from '../../src/theme';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { Card, FadeIn, HeText, ProgressBar, SectionTitle } from '../../src/components/ui';
+import { BadgeGrid, StatRow, StatItem } from '../../src/components/achievements';
+import { Avatar, Bloom } from '../../src/components/Scenery';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
+import { colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 
-const formatDate = (iso: string) => {
-  try {
-    const d = new Date(iso);
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
-  } catch {
-    return '';
-  }
-};
+const GearIcon: React.FC = () => (
+  <Svg width={21} height={21} viewBox="0 0 24 24">
+    <Path
+      d="M12 2.6 l1.9 2.8 h3.3 l.5 3.3 2.8 1.9 -2.8 1.9 -.5 3.3 h-3.3 L12 18.6 l-1.9 -2.8 H6.8 l-.5 -3.3 -2.8 -1.9 2.8 -1.9 .5 -3.3 h3.3 Z"
+      fill={colors.textLight}
+    />
+    <Circle cx="12" cy="10.6" r="3" fill={colors.lotusPink} />
+  </Svg>
+);
 
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const {
     progress,
-    bestScoreFor,
-    lastResultFor,
+    badges,
+    minutesToday,
+    streakDays,
+    overallPercent,
+    bestPoints,
+    maxPoints,
     completedLessons,
-    totalCorrect,
-    setUserName,
   } = useAppState();
 
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(progress.userName);
-  const [error, setError] = useState<string | null>(null);
-
-  const save = async () => {
-    if (!name.trim()) {
-      setError('השם לא יכול להישאר ריק.');
-      return;
-    }
-    await setUserName(name);
-    setError(null);
-    setEditing(false);
-  };
+  const stats: StatItem[] = [
+    { kind: 'calendar', value: `${streakDays}`, unit: streakDays === 1 ? 'יום' : 'ימים', label: 'ברצף' },
+    {
+      kind: 'clock',
+      value: `${minutesToday}`,
+      unit: minutesToday === 1 ? 'דקה' : 'דקות',
+      label: 'לימוד היום',
+    },
+    { kind: 'check', value: `${completedLessons}`, unit: completedLessons === 1 ? 'נושא' : 'נושאים', label: 'הושלמו' },
+  ];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
@@ -52,149 +52,83 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
-          <TropicalScene height={230} style={StyleSheet.absoluteFill as any} />
-          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(2) }]}>
-            <View style={[styles.avatarRing, shadow(2)]}>
-              <Avatar size={84} />
-            </View>
-            <HeText variant="title" style={{ color: colors.pinkDeep, marginTop: spacing(0.75) }}>
-              {progress.userName || 'חברה'}
-            </HeText>
-            <View style={styles.taglineChip}>
-              <HeText variant="small" style={{ textAlign: 'center' }}>
-                🌸 הפרופיל שלי
-              </HeText>
+          <PhotoHero image="tropicalBeach" height={250} tone="cream" dim={0.42} style={StyleSheet.absoluteFill as any} />
+          <Decoration image="palmLeaf" size={118} rotate={-16} style={{ top: -20, right: -34 }} opacity={0.8} />
+          <Decoration image="hibiscus" size={54} style={{ top: 10, left: -14 }} opacity={0.85} />
+          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(1) }]}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="הגדרות"
+              onPress={() => router.push('/(tabs)/more')}
+              style={[styles.gearBtn, shadow(2)]}
+            >
+              <GearIcon />
+            </Pressable>
+
+            <View style={{ alignItems: 'center', marginTop: spacing(1) }}>
+              <View style={[styles.avatarRing, shadow(2)]}>
+                <Avatar size={92} />
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="שינוי השם"
+                onPress={() => router.push('/(tabs)/more')}
+                style={styles.nameRow}
+              >
+                <HeText variant="display" style={{ color: colors.lotusDark }}>
+                  {progress.userName || 'חברה'}
+                </HeText>
+                <HeText style={{ fontSize: 18 }}>✏️</HeText>
+              </Pressable>
+              <View style={styles.taglineChip}>
+                <HeText variant="small" style={{ color: colors.textPrimary, textAlign: 'center' }}>
+                  🌴 לומדת תאילנדית במסע גדול
+                </HeText>
+              </View>
             </View>
           </View>
         </View>
 
         <View style={styles.body}>
           <FadeIn>
-            <Card color={colors.creamCard} style={{ borderWidth: 2, borderColor: colors.lotusMid }}>
-              <View style={styles.rowBetween}>
-                <HeText variant="heading">השם שלי</HeText>
-                {!editing && (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="שינוי השם"
-                    onPress={() => {
-                      setName(progress.userName);
-                      setEditing(true);
-                    }}
-                  >
-                    <HeText variant="small" style={{ color: colors.pink }}>
-                      ✏️ שינוי
-                    </HeText>
-                  </Pressable>
-                )}
+            <Card color={colors.warmWhite} style={{ borderWidth: 2, borderColor: colors.lotusMid }}>
+              <View style={styles.overallHeader}>
+                <HeText variant="heading">התקדמות כללית</HeText>
+                <HeText style={{ fontSize: 22 }}>⭐</HeText>
               </View>
-
-              {editing ? (
-                <>
-                  <TextInput
-                    value={name}
-                    onChangeText={(t) => {
-                      setName(t);
-                      if (error) setError(null);
-                    }}
-                    placeholder="השם שלך"
-                    placeholderTextColor={colors.textFaint}
-                    style={[styles.input, he, error ? { borderColor: colors.error } : null]}
-                    accessibilityLabel="שדה שינוי שם"
-                    maxLength={24}
-                    allowFontScaling
-                  />
-                  {!!error && (
-                    <HeText variant="small" style={{ color: colors.error, marginTop: spacing(0.5) }}>
-                      ⚠ {error}
-                    </HeText>
-                  )}
-                  <View style={styles.editRow}>
-                    <AppButton title="שמירה" style={{ flex: 1 }} onPress={save} />
-                    <AppButton
-                      title="ביטול"
-                      variant="ghost"
-                      style={{ flex: 1 }}
-                      onPress={() => {
-                        setEditing(false);
-                        setError(null);
-                      }}
-                    />
-                  </View>
-                </>
-              ) : (
-                <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.25) }}>
-                  {progress.userName || 'עוד לא בחרת שם'}
-                </HeText>
-              )}
+              <View style={styles.barRow}>
+                <View style={{ flex: 1 }}>
+                  <ProgressBar value={bestPoints} total={maxPoints} color={colors.lotusPink} height={14} trackColor={colors.sand} />
+                </View>
+                <View style={styles.percentChip}>
+                  <HeText variant="tiny" style={{ color: colors.textLight, textAlign: 'center' }}>
+                    {overallPercent}%
+                  </HeText>
+                </View>
+              </View>
+              <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(0.75) }}>
+                {bestPoints}/{maxPoints} נקודות
+              </HeText>
             </Card>
           </FadeIn>
 
-          <FadeIn delay={70}>
-            <View style={styles.statRow}>
-              <View style={[styles.stat, shadow(1), { backgroundColor: colors.leafSoft }]}>
-                <HeText style={styles.statNum}>{completedLessons}</HeText>
-                <HeText variant="tiny" style={{ color: colors.textSoft, textAlign: 'center' }}>
-                  שיעורים שהושלמו
-                </HeText>
-              </View>
-              <View style={[styles.stat, shadow(1), { backgroundColor: colors.mangoSoft }]}>
-                <HeText style={styles.statNum}>{totalCorrect}</HeText>
-                <HeText variant="tiny" style={{ color: colors.textSoft, textAlign: 'center' }}>
-                  תשובות נכונות
-                </HeText>
-              </View>
-              <View style={[styles.stat, shadow(1), { backgroundColor: colors.lotusSoft }]}>
-                <HeText style={styles.statNum}>{progress.results.length}</HeText>
-                <HeText variant="tiny" style={{ color: colors.textSoft, textAlign: 'center' }}>
-                  חידונים שסיימת
-                </HeText>
-              </View>
-            </View>
+          <FadeIn delay={80}>
+            <SectionTitle title="ההישגים שלי" emoji="🏆" />
           </FadeIn>
 
           <FadeIn delay={120}>
-            <SectionTitle title="ההתקדמות לפי קטגוריה" emoji="📚" />
+            <BadgeGrid badges={badges} />
           </FadeIn>
 
-          {CATEGORIES.map((cat, i) => {
-            const palette = categoryPalette[cat.colorKey];
-            const best = bestScoreFor(cat.id);
-            const last = lastResultFor(cat.id);
-            return (
-              <FadeIn key={cat.id} delay={160 + i * 45}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`לתרגל שוב את ${cat.titleHe}`}
-                  onPress={() => router.push(`/category/${cat.id}`)}
-                  style={({ pressed }) => [styles.catRow, shadow(1), pressed && { opacity: 0.9 }]}
-                >
-                  <CategoryIcon name={cat.icon} size={40} />
-                  <View style={{ flex: 1, gap: spacing(0.4) }}>
-                    <View style={styles.rowBetween}>
-                      <HeText variant="heading" numberOfLines={1} style={{ flex: 1, fontSize: 16 }}>
-                        {cat.titleHe}
-                      </HeText>
-                      <Pill
-                        label={last ? `ציון אחרון ${last.score}/${last.total}` : 'עוד לא התחלת'}
-                        bg={last ? colors.lotusSoft : colors.border}
-                        fg={last ? colors.pinkDeep : colors.textSoft}
-                      />
-                    </View>
-                    <ProgressBar value={best} total={QUESTIONS_PER_QUIZ} color={palette.accent} height={9} />
-                    <HeText variant="tiny" style={{ color: colors.textFaint }}>
-                      שיא: {best}/{QUESTIONS_PER_QUIZ}
-                      {last ? ` · עודכן: ${formatDate(last.completedAt)}` : ''}
-                    </HeText>
-                  </View>
-                </Pressable>
-              </FadeIn>
-            );
-          })}
-
-          <FadeIn delay={460}>
-            <AppButton title="חזרה למסך הבית" variant="secondary" onPress={() => router.push('/(tabs)')} />
+          <FadeIn delay={180}>
+            <SectionTitle title="הסטטיסטיקות שלי" emoji="📊" />
           </FadeIn>
+
+          <FadeIn delay={220}>
+            <StatRow stats={stats} />
+          </FadeIn>
+
+          <Bloom size={30} color={colors.lotusPink} style={{ alignSelf: 'center', opacity: 0.5 }} />
         </View>
       </ScrollView>
     </View>
@@ -202,19 +136,32 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { height: 230, overflow: 'hidden' },
-  heroContent: { flex: 1, alignItems: 'center', paddingHorizontal: spacing(2) },
+  hero: { height: 250, overflow: 'hidden' },
+  heroContent: { flex: 1, paddingHorizontal: spacing(2) },
+  gearBtn: {
+    position: 'absolute',
+    top: spacing(1),
+    left: spacing(2),
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.lotusPink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 3,
+  },
   avatarRing: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 104,
+    height: 104,
+    borderRadius: 52,
     borderWidth: 5,
-    borderColor: colors.lotus,
-    backgroundColor: colors.white,
+    borderColor: colors.lotusPink,
+    backgroundColor: colors.textLight,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  nameRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: spacing(0.75) },
   taglineChip: {
     backgroundColor: 'rgba(255,255,255,0.82)',
     borderRadius: radius.pill,
@@ -223,40 +170,13 @@ const styles = StyleSheet.create({
     marginTop: spacing(0.5),
   },
   body: { paddingHorizontal: spacing(2), marginTop: -spacing(2), gap: spacing(1.25) },
-  rowBetween: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing(1),
-  },
-  input: {
-    marginTop: spacing(1),
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.white,
-    paddingHorizontal: spacing(2),
-    minHeight: 52,
-    fontSize: typography.body.fontSize,
-    color: colors.text,
-  },
-  editRow: { flexDirection: 'row-reverse', gap: spacing(1), marginTop: spacing(1.25) },
-  statRow: { flexDirection: 'row-reverse', gap: spacing(1) },
-  stat: {
-    flex: 1,
-    borderRadius: radius.lg,
-    paddingVertical: spacing(1.4),
-    paddingHorizontal: spacing(0.6),
-    alignItems: 'center',
-    gap: spacing(0.25),
-  },
-  statNum: { fontSize: 28, lineHeight: 38, fontWeight: '900', color: colors.text, textAlign: 'center' },
-  catRow: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: spacing(1.1),
-    borderRadius: radius.lg,
-    backgroundColor: colors.white,
-    padding: spacing(1.25),
+  overallHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  barRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1), marginTop: spacing(1.25) },
+  percentChip: {
+    backgroundColor: colors.lotusPink,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing(1),
+    paddingVertical: spacing(0.35),
+    minWidth: 50,
   },
 });

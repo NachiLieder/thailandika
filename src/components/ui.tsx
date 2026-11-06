@@ -9,7 +9,7 @@ import {
   ViewStyle,
   ActivityIndicator,
 } from 'react-native';
-import { colors, he, radius, shadow, spacing, thaiText, typography, rtlRow } from '../theme';
+import { colors, fonts, he, radius, shadow, spacing, thaiText, typography, rtlRow } from '../theme';
 
 /* ---------- טקסט ---------- */
 
@@ -59,7 +59,7 @@ export const Card: React.FC<{
   children: React.ReactNode;
   style?: ViewStyle | ViewStyle[];
   color?: string;
-}> = ({ children, style, color = colors.white }) => (
+}> = ({ children, style, color = colors.textLight }) => (
   <View style={[styles.card, { backgroundColor: color }, shadow(1), style as ViewStyle]}>{children}</View>
 );
 
@@ -91,11 +91,11 @@ export const AppButton: React.FC<ButtonProps> = ({
     Animated.spring(scale, { toValue: to, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
 
   const palette: Record<string, { bg: string; fg: string; border?: string }> = {
-    primary: { bg: colors.pink, fg: colors.white },
-    mango: { bg: colors.mango, fg: '#543B05' },
-    turquoise: { bg: colors.turquoise, fg: colors.white },
-    secondary: { bg: colors.white, fg: colors.pink, border: colors.pink },
-    ghost: { bg: 'transparent', fg: colors.textSoft },
+    primary: { bg: colors.lotusPink, fg: colors.textLight },
+    mango: { bg: colors.mangoYellow, fg: '#543B05' },
+    turquoise: { bg: colors.turquoise, fg: colors.textLight },
+    secondary: { bg: colors.textLight, fg: colors.lotusPink, border: colors.lotusPink },
+    ghost: { bg: 'transparent', fg: colors.textSecondary },
     danger: { bg: colors.errorSoft, fg: colors.error, border: colors.error },
   };
   const p = palette[variant];
@@ -140,7 +140,7 @@ export const ProgressBar: React.FC<{
   color?: string;
   height?: number;
   trackColor?: string;
-}> = ({ value, total, color = colors.leaf, height = 12, trackColor = colors.border }) => {
+}> = ({ value, total, color = colors.palmGreen, height = 12, trackColor = colors.border }) => {
   const pct = total > 0 ? Math.max(0, Math.min(1, value / total)) : 0;
   const anim = useRef(new Animated.Value(pct)).current;
   useEffect(() => {
@@ -195,10 +195,10 @@ export const Logo: React.FC<{ compact?: boolean }> = ({ compact }) => (
           he,
           {
             textAlign: 'center',
-            color: colors.pinkDeep,
-            fontSize: compact ? 24 : 36,
-            lineHeight: compact ? 34 : 48,
-            fontWeight: '900',
+            color: colors.lotusDark,
+            fontSize: compact ? 24 : 34,
+            lineHeight: compact ? 34 : 46,
+            fontFamily: fonts.black,
           },
         ]}
         allowFontScaling
@@ -207,7 +207,7 @@ export const Logo: React.FC<{ compact?: boolean }> = ({ compact }) => (
       </Text>
       {!compact && (
         <Text
-          style={[he, typography.small, { textAlign: 'center', color: colors.pink, marginTop: -2 }]}
+          style={[he, typography.small, { textAlign: 'center', color: colors.lotusPink, marginTop: -2 }]}
           allowFontScaling
         >
           לומדים תאילנדית בכיף
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   logoPlate: {
-    backgroundColor: colors.creamCard,
+    backgroundColor: colors.warmWhite,
     borderRadius: radius.lg,
     borderWidth: 3,
     borderColor: colors.lotusMid,

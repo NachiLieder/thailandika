@@ -28,6 +28,13 @@ const PersonIcon: React.FC<IconProps> = ({ color }) => (
     <Path d="M3.8 21 C4.6 15.8 8 13.6 12 13.6 C16 13.6 19.4 15.8 20.2 21 Z" fill={color} />
   </Svg>
 );
+const ChartIcon: React.FC<IconProps> = ({ color }) => (
+  <Svg width={25} height={25} viewBox="0 0 24 24">
+    <Rect x="3.4" y="12.5" width="4.2" height="8" rx="1.6" fill={color} />
+    <Rect x="9.9" y="7.5" width="4.2" height="13" rx="1.6" fill={color} />
+    <Rect x="16.4" y="3.5" width="4.2" height="17" rx="1.6" fill={color} />
+  </Svg>
+);
 const MoreIcon: React.FC<IconProps> = ({ color }) => (
   <Svg width={25} height={25} viewBox="0 0 24 24">
     <Circle cx="5.5" cy="12" r="2.1" fill={color} />
@@ -41,13 +48,14 @@ type TabBarProps = {
   navigateToTab: (routeKey: string) => void;
 };
 
-/** סרגל ניווט תחתון בכיווניות RTL: בית · הישגים · הפרופיל · עוד */
+/** סרגל ניווט תחתון בכיווניות RTL: בית · התקדמות · הישגים · פרופיל · עוד */
 function TabBar({ state, navigateToTab }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const tabs = [
     { name: 'index', label: 'בית', Icon: HomeIcon },
+    { name: 'progress', label: 'התקדמות', Icon: ChartIcon },
     { name: 'achievements', label: 'הישגים', Icon: TrophyIcon },
-    { name: 'profile', label: 'הפרופיל', Icon: PersonIcon },
+    { name: 'profile', label: 'פרופיל', Icon: PersonIcon },
     { name: 'more', label: 'עוד', Icon: MoreIcon },
   ];
 
@@ -69,11 +77,12 @@ function TabBar({ state, navigateToTab }: TabBarProps) {
             }}
             style={styles.tab}
           >
-            <Icon color={focused ? colors.pink : colors.textFaint} />
-            <Text style={[styles.label, focused && styles.labelActive]} allowFontScaling>
+            <View style={[styles.iconSlot, focused && styles.iconSlotActive, focused && shadow(2)]}>
+              <Icon color={focused ? colors.textLight : colors.textSecondary} />
+            </View>
+            <Text style={[styles.label, focused && styles.labelActive]} allowFontScaling numberOfLines={1}>
               {label}
             </Text>
-            {focused && <View style={styles.activeDash} />}
           </Pressable>
         );
       })}
@@ -85,8 +94,9 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...(props as unknown as TabBarProps)} />}>
       <Tabs.Screen name="index" options={{ title: 'בית' }} />
+      <Tabs.Screen name="progress" options={{ title: 'התקדמות' }} />
       <Tabs.Screen name="achievements" options={{ title: 'הישגים' }} />
-      <Tabs.Screen name="profile" options={{ title: 'הפרופיל' }} />
+      <Tabs.Screen name="profile" options={{ title: 'פרופיל' }} />
       <Tabs.Screen name="more" options={{ title: 'עוד' }} />
     </Tabs>
   );
@@ -96,7 +106,7 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row-reverse',
     alignItems: 'flex-end',
-    backgroundColor: colors.creamCard,
+    backgroundColor: colors.warmWhite,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
     paddingTop: spacing(1.25),
@@ -106,22 +116,32 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     alignItems: 'center',
-    gap: 3,
+    gap: 2,
     paddingBottom: spacing(0.5),
+  },
+  iconSlot: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconSlotActive: {
+    backgroundColor: colors.lotusPink,
+    marginTop: -spacing(2),
+    borderWidth: 4,
+    borderColor: colors.warmWhite,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   label: {
     ...typography.tiny,
-    color: colors.textFaint,
+    fontSize: 11,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   labelActive: {
-    color: colors.pink,
-  },
-  activeDash: {
-    width: 26,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: colors.pink,
-    marginTop: 1,
+    color: colors.lotusPink,
   },
 });

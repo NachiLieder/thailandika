@@ -6,7 +6,7 @@ import { colors } from '../theme';
 /** עלה דקל מסוגנן */
 export const PalmLeaf: React.FC<{ size?: number; color?: string; style?: ViewStyle }> = ({
   size = 90,
-  color = colors.leaf,
+  color = colors.palmGreen,
   style,
 }) => (
   <View style={style} pointerEvents="none">
@@ -39,7 +39,7 @@ export const PalmLeaf: React.FC<{ size?: number; color?: string; style?: ViewSty
 /** פרח היביסקוס/לוטוס מסוגנן */
 export const Hibiscus: React.FC<{ size?: number; color?: string; style?: ViewStyle }> = ({
   size = 60,
-  color = colors.lotus,
+  color = colors.lotusPink,
   style,
 }) => (
   <View style={style} pointerEvents="none">
@@ -57,7 +57,7 @@ export const Hibiscus: React.FC<{ size?: number; color?: string; style?: ViewSty
             transform={`rotate(${deg} 50 50)`}
           />
         ))}
-        <Circle cx="50" cy="50" r="11" fill={colors.mango} />
+        <Circle cx="50" cy="50" r="11" fill={colors.mangoYellow} />
         <Circle cx="50" cy="50" r="5" fill="#FFF3D6" />
       </G>
     </Svg>
@@ -68,7 +68,7 @@ export const Hibiscus: React.FC<{ size?: number; color?: string; style?: ViewSty
 export const Wave: React.FC<{ width?: number; height?: number; color?: string; style?: ViewStyle }> = ({
   width = 400,
   height = 40,
-  color = colors.turquoiseLight,
+  color = colors.turquoiseMid,
   style,
 }) => (
   <View style={style} pointerEvents="none">
@@ -116,11 +116,11 @@ export const Elephant: React.FC<{ size?: number; style?: ViewStyle }> = ({ size 
           strokeLinecap="round"
           fill="none"
         />
-        <Circle cx="40" cy="44" r="4" fill={colors.text} />
-        <Circle cx="60" cy="44" r="4" fill={colors.text} />
-        <Circle cx="34" cy="55" r="5" fill={colors.lotus} opacity={0.5} />
-        <Circle cx="66" cy="55" r="5" fill={colors.lotus} opacity={0.5} />
-        <Path d="M30 26 Q50 14 70 26" stroke={colors.lotus} strokeWidth={5} fill="none" strokeLinecap="round" />
+        <Circle cx="40" cy="44" r="4" fill={colors.textPrimary} />
+        <Circle cx="60" cy="44" r="4" fill={colors.textPrimary} />
+        <Circle cx="34" cy="55" r="5" fill={colors.lotusPink} opacity={0.5} />
+        <Circle cx="66" cy="55" r="5" fill={colors.lotusPink} opacity={0.5} />
+        <Path d="M30 26 Q50 14 70 26" stroke={colors.lotusPink} strokeWidth={5} fill="none" strokeLinecap="round" />
       </G>
     </Svg>
   </View>
@@ -143,8 +143,8 @@ export const TropicalBackdrop: React.FC<{ tint?: string }> = ({ tint = colors.tu
         opacity: 0.85,
       }}
     />
-    <PalmLeaf size={150} color={colors.leaf} style={{ position: 'absolute', top: -20, left: -40, opacity: 0.35 }} />
-    <Hibiscus size={64} color={colors.lotus} style={{ position: 'absolute', top: 120, right: -14, opacity: 0.3 }} />
-    <Hibiscus size={44} color={colors.mango} style={{ position: 'absolute', bottom: 40, left: 10, opacity: 0.22 }} />
+    <PalmLeaf size={150} color={colors.palmGreen} style={{ position: 'absolute', top: -20, left: -40, opacity: 0.35 }} />
+    <Hibiscus size={64} color={colors.lotusPink} style={{ position: 'absolute', top: 120, right: -14, opacity: 0.3 }} />
+    <Hibiscus size={44} color={colors.mangoYellow} style={{ position: 'absolute', bottom: 40, left: 10, opacity: 0.22 }} />
   </View>
 );

@@ -7,11 +7,11 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { AppButton, Card, FadeIn, HeText, ProgressBar, ThaiLabel } from '../../src/components/ui';
 import { AudioButton } from '../../src/components/AudioButton';
 import { CategoryIcon } from '../../src/components/CategoryIcon';
-import { SceneCard } from '../../src/components/Scenery';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { getCategory } from '../../src/data/categories';
 import { getQuestionsByCategory, QUESTIONS_PER_QUIZ } from '../../src/data/questions';
 import { QuizOption } from '../../src/data/types';
-import { colors, radius, shadow, spacing } from '../../src/theme';
+import { categoryPhoto, colors, fonts, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 import { useStudyTimer } from '../../src/state/useStudyTimer';
 import { shuffle } from '../../src/utils/shuffle';
@@ -23,14 +23,14 @@ const PRAISE = ['עבודה מעולה! 🌸', 'מדויק לגמרי! 🌺', '�
 
 const BackArrow: React.FC = () => (
   <Svg width={21} height={21} viewBox="0 0 24 24">
-    <Path d="M15 5 L8 12 L15 19" stroke={colors.white} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M15 5 L8 12 L15 19" stroke={colors.textLight} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
 const CheckCircle: React.FC<{ size?: number; bg?: string; fg?: string }> = ({
   size = 26,
-  bg = colors.white,
-  fg = colors.pink,
+  bg = colors.textLight,
+  fg = colors.lotusPink,
 }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
     <Circle cx="12" cy="12" r="11" fill={bg} />
@@ -41,7 +41,7 @@ const CheckCircle: React.FC<{ size?: number; bg?: string; fg?: string }> = ({
 const CrossCircle: React.FC<{ size?: number }> = ({ size = 26 }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
     <Circle cx="12" cy="12" r="11" fill={colors.error} />
-    <Path d="M8.4 8.4 l7.2 7.2 M15.6 8.4 l-7.2 7.2" stroke={colors.white} strokeWidth={2.6} strokeLinecap="round" />
+    <Path d="M8.4 8.4 l7.2 7.2 M15.6 8.4 l-7.2 7.2" stroke={colors.textLight} strokeWidth={2.6} strokeLinecap="round" />
   </Svg>
 );
 
@@ -156,7 +156,7 @@ export default function QuizScreen() {
       <View style={{ flex: 1, backgroundColor: colors.cream, padding: spacing(2), justifyContent: 'center' }}>
         <Card>
           <HeText variant="heading">לא מצאנו חידון לקטגוריה הזו</HeText>
-          <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+          <HeText variant="body" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
             אפשר לחזור לבית ולבחור קטגוריה אחרת.
           </HeText>
           <AppButton title="חזרה לבית" style={{ marginTop: spacing(2) }} onPress={() => router.replace('/(tabs)')} />
@@ -183,7 +183,7 @@ export default function QuizScreen() {
           <CategoryIcon name={category.icon} size={30} />
         </View>
 
-        <HeText variant="title" style={{ flex: 1, textAlign: 'center', color: colors.pinkDeep }} numberOfLines={1}>
+        <HeText variant="title" style={{ flex: 1, textAlign: 'center', color: colors.lotusDark }} numberOfLines={1}>
           {category.titleHe}
         </HeText>
 
@@ -203,10 +203,10 @@ export default function QuizScreen() {
       </View>
 
       <View style={styles.progressWrap}>
-        <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+        <HeText variant="small" style={{ color: colors.textSecondary, textAlign: 'center' }}>
           📖 שאלה {index + 1} מתוך {QUESTIONS_PER_QUIZ}
         </HeText>
-        <ProgressBar value={index} total={QUESTIONS_PER_QUIZ} color={colors.pink} height={10} />
+        <ProgressBar value={index} total={QUESTIONS_PER_QUIZ} color={colors.lotusPink} height={10} trackColor={colors.sand} />
       </View>
 
       <ScrollView
@@ -214,9 +214,18 @@ export default function QuizScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <FadeIn key={question.id}>
-          <SceneCard height={146} style={shadow(1)}>
-            <CategoryIcon name={category.icon} size={54} />
-          </SceneCard>
+          <PhotoHero
+            image={categoryPhoto[category.id] ?? 'thaiTemple'}
+            height={146}
+            rounded
+            dim={0.22}
+            style={shadow(1)}
+          >
+            <View style={styles.sceneBadge}>
+              <CategoryIcon name={category.icon} size={46} />
+            </View>
+            <Decoration image="palmLeaf" size={88} rotate={-20} style={{ top: -12, right: -20 }} opacity={0.9} />
+          </PhotoHero>
         </FadeIn>
 
         <FadeIn key={`${question.id}-q`} delay={60}>
@@ -240,7 +249,7 @@ export default function QuizScreen() {
               />
             )}
 
-            <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+            <HeText variant="small" style={{ color: colors.textSecondary, textAlign: 'center' }}>
               בחרי את התשובה הנכונה:
             </HeText>
           </View>
@@ -262,7 +271,7 @@ export default function QuizScreen() {
                 style={({ pressed }) => [
                   styles.option,
                   shadow(1),
-                  isChosenCorrect && { backgroundColor: colors.pink, borderColor: colors.pink },
+                  isChosenCorrect && { backgroundColor: colors.lotusPink, borderColor: colors.lotusPink },
                   isWrong && { backgroundColor: colors.errorSoft, borderColor: colors.error },
                   pressed && !isChosenCorrect && { opacity: 0.9 },
                 ]}
@@ -272,7 +281,7 @@ export default function QuizScreen() {
                     {opt.labelThai ? (
                       <ThaiLabel
                         size="small"
-                        color={isChosenCorrect ? colors.white : colors.text}
+                        color={isChosenCorrect ? colors.textLight : colors.textPrimary}
                         style={{ textAlign: 'center' }}
                       >
                         {opt.labelThai}
@@ -282,8 +291,8 @@ export default function QuizScreen() {
                         variant="body"
                         style={{
                           textAlign: 'center',
-                          fontWeight: '800',
-                          color: isChosenCorrect ? colors.white : isWrong ? colors.error : colors.text,
+                          fontFamily: fonts.bold,
+                          color: isChosenCorrect ? colors.textLight : isWrong ? colors.error : colors.textPrimary,
                         }}
                       >
                         {opt.labelHe}
@@ -300,11 +309,11 @@ export default function QuizScreen() {
 
         {phase === 'correct-feedback' && (
           <FadeIn>
-            <View style={[styles.feedback, { backgroundColor: colors.leafSoft, borderColor: colors.leafMid }]}>
+            <View style={[styles.feedback, { backgroundColor: colors.successSoft, borderColor: colors.palmGreen }]}>
               <View style={styles.feedbackRow}>
-                <CheckCircle size={34} bg={colors.leaf} fg={colors.white} />
+                <CheckCircle size={34} bg={colors.palmGreen} fg={colors.textLight} />
                 <View style={{ flex: 1 }}>
-                  <HeText variant="heading" style={{ color: colors.leaf }}>
+                  <HeText variant="heading" style={{ color: colors.palmGreen }}>
                     בחירה נכונה!
                   </HeText>
                   <HeText variant="small" style={{ color: '#2F6B51' }}>
@@ -354,6 +363,17 @@ export default function QuizScreen() {
 }
 
 const styles = StyleSheet.create({
+  sceneBadge: {
+    position: 'absolute',
+    bottom: 12,
+    alignSelf: 'center',
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: 'rgba(255, 252, 247, 0.93)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   header: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -365,7 +385,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.pink,
+    backgroundColor: colors.lotusPink,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -373,7 +393,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -385,13 +405,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing(1.25),
     paddingHorizontal: spacing(1),
     borderWidth: 2,
-    borderColor: colors.turquoiseLight,
+    borderColor: colors.turquoiseMid,
   },
   option: {
     borderRadius: radius.pill,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     paddingVertical: spacing(1.4),
     paddingHorizontal: spacing(2),
     minHeight: 58,

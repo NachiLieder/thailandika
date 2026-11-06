@@ -50,7 +50,7 @@ export const ScreenHeader: React.FC<Props> = ({ title, subtitle, onBack, backLab
           {title}
         </HeText>
         {!!subtitle && (
-          <HeText variant="small" style={{ color: colors.textSoft }} numberOfLines={1}>
+          <HeText variant="small" style={{ color: colors.textSecondary }} numberOfLines={1}>
             {subtitle}
           </HeText>
         )}
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     alignItems: 'center',
     justifyContent: 'center',
   },

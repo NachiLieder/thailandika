@@ -27,7 +27,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-audio"
+      "expo-audio",
+      "expo-font"
     ],
     "scheme": "thailandika",
     "backgroundColor": "#FFF9EF",

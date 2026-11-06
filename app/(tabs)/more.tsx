@@ -3,7 +3,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, TextInput, 
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, Card, FadeIn, HeText, Pill } from '../../src/components/ui';
-import { TropicalScene } from '../../src/components/Scenery';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { colors, he, radius, shadow, spacing, typography } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 import { missingAudioItems } from '../../src/data/items';
@@ -61,13 +61,14 @@ export default function SettingsScreen() {
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing(12) }}>
         <View style={styles.hero}>
-          <TropicalScene height={210} style={StyleSheet.absoluteFill as any} />
+          <PhotoHero image="thaiTemple" height={210} dim={0.32} style={StyleSheet.absoluteFill as any} />
+          <Decoration image="palmLeaf" size={110} rotate={-16} style={{ top: -18, right: -30 }} opacity={0.85} />
           <View style={[styles.heroContent, { paddingTop: insets.top + spacing(2) }]}>
             <View style={styles.heroPlate}>
-              <HeText variant="title" style={{ color: colors.pinkDeep, textAlign: 'center' }}>
+              <HeText variant="title" style={{ color: colors.lotusDark, textAlign: 'center' }}>
                 ⚙️ עוד והגדרות
               </HeText>
-              <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+              <HeText variant="small" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                 הכול נשמר במכשיר שלך בלבד.
               </HeText>
             </View>
@@ -82,7 +83,7 @@ export default function SettingsScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholder="השם שלך"
-                placeholderTextColor={colors.textFaint}
+                placeholderTextColor={colors.textSecondary}
                 style={[styles.input, he]}
                 accessibilityLabel="שדה שינוי שם"
                 maxLength={24}
@@ -90,7 +91,7 @@ export default function SettingsScreen() {
               />
               <AppButton title="שמירת השם" style={{ marginTop: spacing(1.5) }} onPress={saveName} />
               {!!savedMsg && (
-                <HeText variant="small" style={{ color: colors.leaf, marginTop: spacing(1) }}>
+                <HeText variant="small" style={{ color: colors.palmGreen, marginTop: spacing(1) }}>
                   {savedMsg}
                 </HeText>
               )}
@@ -102,7 +103,7 @@ export default function SettingsScreen() {
               <View style={styles.switchRow}>
                 <View style={{ flex: 1 }}>
                   <HeText variant="heading">צלילי ממשק והשמעה</HeText>
-                  <HeText variant="small" style={{ color: colors.textSoft }}>
+                  <HeText variant="small" style={{ color: colors.textSecondary }}>
                     כשהאפשרות כבויה, כפתורי ההשמעה אינם פעילים.
                   </HeText>
                 </View>
@@ -113,7 +114,7 @@ export default function SettingsScreen() {
                     void updateSettings({ soundEnabled: v });
                   }}
                   trackColor={{ true: colors.turquoise, false: colors.border }}
-                  thumbColor={colors.white}
+                  thumbColor={colors.textLight}
                   accessibilityLabel="הפעלה או כיבוי של צלילים"
                 />
               </View>
@@ -123,7 +124,7 @@ export default function SettingsScreen() {
           <FadeIn delay={140}>
             <Card>
               <HeText variant="heading">מהירות ההשמעה</HeText>
-              <HeText variant="small" style={{ color: colors.textSoft, marginBottom: spacing(1) }}>
+              <HeText variant="small" style={{ color: colors.textSecondary, marginBottom: spacing(1) }}>
                 כדאי להתחיל באיטי ולהאיץ כשהאוזן מתרגלת.
               </HeText>
               <View style={styles.rateRow}>
@@ -144,7 +145,7 @@ export default function SettingsScreen() {
                     >
                       <HeText
                         variant="body"
-                        style={{ textAlign: 'center', color: active ? colors.white : colors.text }}
+                        style={{ textAlign: 'center', color: active ? colors.textLight : colors.textPrimary }}
                       >
                         {active ? '✓ ' : ''}
                         {r.label}
@@ -159,7 +160,7 @@ export default function SettingsScreen() {
           <FadeIn delay={200}>
             <Card>
               <HeText variant="heading">איפוס התקדמות</HeText>
-              <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.25) }}>
+              <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(0.25) }}>
                 מוחק את כל הציונים וההתקדמות מהמכשיר. השם שלך יישמר.
               </HeText>
               {confirmReset ? (
@@ -184,14 +185,14 @@ export default function SettingsScreen() {
           </FadeIn>
 
           <FadeIn delay={260}>
-            <Card color={colors.turquoiseSoft} style={{ borderWidth: 2, borderColor: colors.turquoiseLight }}>
+            <Card color={colors.turquoiseSoft} style={{ borderWidth: 2, borderColor: colors.turquoiseMid }}>
               <HeText variant="heading">על האפליקציה</HeText>
-              <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+              <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
                 תאילנדיקה · גרסה 1.0{'\n'}
                 אפליקציה ללימוד תאילנדית למתחילות דוברות עברית. כל התוכן, ההתקדמות והניקוד נשמרים במכשיר
                 שלך בלבד, ואינם נשלחים לשום שרת. האפליקציה עובדת גם ללא חיבור לאינטרנט.
               </HeText>
-              <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(1) }}>
+              <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(1) }}>
                 התעתיקים בעברית הם קירוב למתחילות. תאילנדית היא שפה טונאלית, ולכן כדאי להישען על ההשמעה
                 ועל אוזן של דובר/ת תאילנדית.
               </HeText>
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing(2),
     minHeight: 54,
     fontSize: typography.body.fontSize,
-    color: colors.text,
+    color: colors.textPrimary,
   },
   switchRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1.5) },
   rateRow: { flexDirection: 'row-reverse', gap: spacing(1) },
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     alignItems: 'center',
     justifyContent: 'center',
   },

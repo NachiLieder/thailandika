@@ -4,11 +4,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { AppButton, Card, FadeIn, HeText, ThaiLabel } from '../../src/components/ui';
-import { BeachScene, Bloom, Medal, TrophyCup } from '../../src/components/Scenery';
+import { Bloom, Medal, TrophyCup } from '../../src/components/Scenery';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { getCategory } from '../../src/data/categories';
 import { getLessonItems } from '../../src/data/items';
 import { QUESTIONS_PER_QUIZ } from '../../src/data/questions';
-import { colors, radius, shadow, spacing } from '../../src/theme';
+import { colors, fonts, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 
 const messageFor = (score: number) => {
@@ -29,9 +30,9 @@ const praiseFor = (score: number) => {
 const Ribbon: React.FC<{ text: string }> = ({ text }) => (
   <View style={styles.ribbonWrap}>
     <Svg width="100%" height="64" viewBox="0 0 300 64" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
-      <Path d="M8 10 H292 L276 32 L292 54 H8 L24 32 Z" fill={colors.pink} />
-      <Path d="M8 10 L24 32 L8 54 Z" fill={colors.pinkDeep} opacity={0.5} />
-      <Path d="M292 10 L276 32 L292 54 Z" fill={colors.pinkDeep} opacity={0.5} />
+      <Path d="M8 10 H292 L276 32 L292 54 H8 L24 32 Z" fill={colors.lotusPink} />
+      <Path d="M8 10 L24 32 L8 54 Z" fill={colors.lotusDark} opacity={0.5} />
+      <Path d="M292 10 L276 32 L292 54 Z" fill={colors.lotusDark} opacity={0.5} />
     </Svg>
     <HeText variant="display" style={styles.ribbonText}>
       {text}
@@ -75,7 +76,7 @@ export default function ResultScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <BeachScene height={420} />
+        <PhotoHero image="tropicalBeach" height={420} dim={0.18} />
       </View>
 
       <ScrollView
@@ -89,17 +90,20 @@ export default function ResultScreen() {
           <Animated.View style={{ alignItems: 'center', transform: [{ scale: pop }] }}>
             <TrophyCup size={150} />
             <Ribbon text="כל הכבוד!" />
-            <HeText style={styles.bigScore}>
-              {finalScore}/{QUESTIONS_PER_QUIZ}
-            </HeText>
-            <HeText variant="heading" style={{ textAlign: 'center', color: colors.text }}>
-              סיימת את כל {QUESTIONS_PER_QUIZ} השאלות!
-            </HeText>
+            {/* לוחית שמנת מתחת לניקוד – הטקסט חייב להישאר קריא מעל התצלום */}
+            <View style={[styles.scorePlate, shadow(2)]}>
+              <HeText style={styles.bigScore}>
+                {finalScore}/{QUESTIONS_PER_QUIZ}
+              </HeText>
+              <HeText variant="heading" style={{ textAlign: 'center', color: colors.textPrimary }}>
+                סיימת את כל {QUESTIONS_PER_QUIZ} השאלות!
+              </HeText>
+            </View>
           </Animated.View>
         </FadeIn>
 
         <FadeIn delay={120}>
-          <Card color={colors.creamCard} style={styles.praiseCard}>
+          <Card color={colors.warmWhite} style={styles.praiseCard}>
             <HeText style={{ fontSize: 20 }}>❤️</HeText>
             <HeText variant="heading" style={{ flex: 1, textAlign: 'center' }}>
               {praiseFor(finalScore)}
@@ -108,16 +112,16 @@ export default function ResultScreen() {
         </FadeIn>
 
         <FadeIn delay={180}>
-          <Card color={colors.creamCard} style={styles.infoCard}>
+          <Card color={colors.warmWhite} style={styles.infoCard}>
             <View style={styles.infoIcon}>
               <HeText style={{ fontSize: 24, textAlign: 'center' }}>⭐</HeText>
             </View>
             <View style={styles.infoDivider} />
             <View style={{ flex: 1 }}>
-              <HeText variant="small" style={{ color: colors.textSoft }}>
+              <HeText variant="small" style={{ color: colors.textSecondary }}>
                 ציון סופי
               </HeText>
-              <HeText variant="title" style={{ color: colors.pinkDeep }}>
+              <HeText variant="title" style={{ color: colors.lotusDark }}>
                 {percent}%
               </HeText>
             </View>
@@ -126,11 +130,11 @@ export default function ResultScreen() {
 
         {!!freshBadge && (
           <FadeIn delay={220}>
-            <Card color={colors.creamCard} style={styles.infoCard}>
+            <Card color={colors.warmWhite} style={styles.infoCard}>
               <Medal size={44} tone={freshBadge.tone} />
               <View style={styles.infoDivider} />
               <View style={{ flex: 1 }}>
-                <HeText variant="small" style={{ color: colors.textSoft }}>
+                <HeText variant="small" style={{ color: colors.textSecondary }}>
                   הישג חדש!
                 </HeText>
                 <HeText variant="heading">{freshBadge.titleHe}</HeText>
@@ -142,14 +146,14 @@ export default function ResultScreen() {
         <FadeIn delay={260}>
           <Card style={{ gap: spacing(0.75) }}>
             <HeText variant="heading">{messageFor(finalScore)}</HeText>
-            <HeText variant="small" style={{ color: colors.textSoft }}>
+            <HeText variant="small" style={{ color: colors.textSecondary }}>
               {category.longDescriptionHe} השיא שלך ביחידה: {best}/{QUESTIONS_PER_QUIZ}.
             </HeText>
             <View style={styles.wordGrid}>
               {items.slice(0, 6).map((item) => (
                 <View key={item.id} style={styles.wordChip}>
                   <ThaiLabel size="small">{item.thai}</ThaiLabel>
-                  <HeText variant="tiny" style={{ color: colors.textSoft, textAlign: 'center' }}>
+                  <HeText variant="tiny" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                     {item.meaningHe}
                   </HeText>
                 </View>
@@ -168,13 +172,23 @@ export default function ResultScreen() {
           />
         </View>
 
-        <Bloom size={30} color={colors.lotus} style={{ alignSelf: 'center', opacity: 0.6 }} />
+        <Bloom size={30} color={colors.lotusPink} style={{ alignSelf: 'center', opacity: 0.6 }} />
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scorePlate: {
+    marginTop: spacing(1),
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 252, 247, 0.94)',
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: colors.lotusMid,
+    paddingHorizontal: spacing(3),
+    paddingVertical: spacing(1.25),
+  },
   body: { paddingHorizontal: spacing(2), gap: spacing(1.5) },
   ribbonWrap: {
     width: '92%',
@@ -184,17 +198,17 @@ const styles = StyleSheet.create({
   },
   ribbonText: {
     textAlign: 'center',
-    color: colors.white,
+    color: colors.textLight,
     fontSize: 30,
     lineHeight: 40,
-    fontWeight: '900',
+    fontFamily: fonts.black,
   },
   bigScore: {
     textAlign: 'center',
     fontSize: 58,
     lineHeight: 72,
-    fontWeight: '900',
-    color: colors.pink,
+    fontFamily: fonts.black,
+    color: colors.lotusPink,
   },
   praiseCard: {
     flexDirection: 'row-reverse',

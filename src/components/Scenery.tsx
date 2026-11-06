@@ -191,7 +191,7 @@ export const Lotus: React.FC<{ size?: number; style?: ViewStyle }> = ({ size = 5
         />
       ))}
       <Ellipse cx="50" cy="52" rx="13" ry="26" fill="#FBC6DA" />
-      <Circle cx="50" cy="48" r="7" fill={colors.mango} />
+      <Circle cx="50" cy="48" r="7" fill={colors.mangoYellow} />
     </Svg>
   </View>
 );
@@ -304,8 +304,8 @@ export const Avatar: React.FC<{ size?: number; style?: ViewStyle }> = ({ size = 
       <Circle cx="66" cy="51" r="4" fill="#F3A5B4" opacity={0.75} />
       <Path d="M44 53 q6 7 12 0" stroke="#C25A6B" strokeWidth={2.6} fill="none" strokeLinecap="round" />
       {/* פרח בשיער */}
-      <Circle cx="74" cy="30" r="7" fill={colors.lotus} />
-      <Circle cx="74" cy="30" r="3" fill={colors.mango} />
+      <Circle cx="74" cy="30" r="7" fill={colors.lotusPink} />
+      <Circle cx="74" cy="30" r="3" fill={colors.mangoYellow} />
     </Svg>
   </View>
 );
@@ -313,7 +313,7 @@ export const Avatar: React.FC<{ size?: number; style?: ViewStyle }> = ({ size = 
 /** פרח קישוט קטן, לפינות הכרטיסים */
 export const Bloom: React.FC<{ size?: number; color?: string; style?: ViewStyle }> = ({
   size = 34,
-  color = colors.lotus,
+  color = colors.lotusPink,
   style,
 }) => (
   <View style={style} pointerEvents="none">
@@ -321,7 +321,7 @@ export const Bloom: React.FC<{ size?: number; color?: string; style?: ViewStyle 
       {[0, 72, 144, 216, 288].map((deg) => (
         <Ellipse key={deg} cx="50" cy="26" rx="16" ry="24" fill={color} transform={`rotate(${deg} 50 50)`} />
       ))}
-      <Circle cx="50" cy="50" r="10" fill={colors.mango} />
+      <Circle cx="50" cy="50" r="10" fill={colors.mangoYellow} />
     </Svg>
   </View>
 );

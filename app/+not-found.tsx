@@ -14,7 +14,7 @@ export default function NotFound() {
         <HeText variant="title" style={{ textAlign: 'center' }}>
           אופס, הדף הזה לא קיים
         </HeText>
-        <HeText variant="body" style={{ color: colors.textSoft, textAlign: 'center' }}>
+        <HeText variant="body" style={{ color: colors.textSecondary, textAlign: 'center' }}>
           בואי נחזור למסך הבית ונמשיך ללמוד.
         </HeText>
         <AppButton title="חזרה לבית" style={{ alignSelf: 'stretch', marginTop: spacing(1) }} onPress={() => router.replace('/')} />

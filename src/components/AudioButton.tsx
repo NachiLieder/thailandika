@@ -60,16 +60,16 @@ export const AudioButton: React.FC<Props> = ({ thai, itemId, label = 'השמעה
       >
         <View style={[rtlRow, { gap: spacing(1), justifyContent: 'center' }]}>
           {state === 'loading' ? (
-            <ActivityIndicator color={disabled ? colors.textFaint : colors.white} />
+            <ActivityIndicator color={disabled ? colors.textSecondary : colors.textLight} />
           ) : (
-            <SpeakerIcon color={disabled ? colors.textFaint : colors.white} size={compact ? 20 : 24} />
+            <SpeakerIcon color={disabled ? colors.textSecondary : colors.textLight} size={compact ? 20 : 24} />
           )}
           <Text
             allowFontScaling
             style={[
               typography.heading,
               compact && typography.small,
-              { color: disabled ? colors.textFaint : colors.white, textAlign: 'center' },
+              { color: disabled ? colors.textSecondary : colors.textLight, textAlign: 'center' },
             ]}
           >
             {text}
@@ -101,6 +101,6 @@ const styles = StyleSheet.create({
   },
   note: {
     marginTop: spacing(0.75),
-    color: colors.textSoft,
+    color: colors.textSecondary,
   },
 });

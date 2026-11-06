@@ -11,7 +11,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, FadeIn, HeText, Logo } from '../src/components/ui';
 import { Elephant } from '../src/components/Decor';
-import { Lotus, ThaiFlag, TropicalScene } from '../src/components/Scenery';
+import { Lotus, ThaiFlag } from '../src/components/Scenery';
+import { Decoration, PhotoHero } from '../src/components/Photo';
 import { colors, he, radius, shadow, spacing, typography } from '../src/theme';
 import { useAppState } from '../src/state/AppStateContext';
 
@@ -38,7 +39,8 @@ export default function Onboarding() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.hero}>
-        <TropicalScene height={250} style={StyleSheet.absoluteFill as any} />
+        <PhotoHero image="phiPhiHero" height={250} dim={0.3} style={StyleSheet.absoluteFill as any} />
+        <Decoration image="palmLeaf" size={132} rotate={-18} style={{ top: -24, right: -38 }} />
         <View style={styles.heroLogo}>
           <Lotus size={44} style={{ marginBottom: -12, zIndex: 2 }} />
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
@@ -57,7 +59,7 @@ export default function Onboarding() {
             <Elephant size={78} />
             <View style={{ flex: 1 }}>
               <HeText variant="title">איזה כיף שבאת ללמוד תאילנדית!</HeText>
-              <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+              <HeText variant="body" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
                 כמה דקות ביום ואת מתחילה להבין ולדבר.
               </HeText>
             </View>
@@ -74,7 +76,7 @@ export default function Onboarding() {
                 if (error) setError(null);
               }}
               placeholder="השם שלך"
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={colors.textSecondary}
               style={[styles.input, he, error ? { borderColor: colors.error } : null]}
               accessibilityLabel="שדה הזנת שם"
               returnKeyType="done"
@@ -93,7 +95,7 @@ export default function Onboarding() {
               disabled={!name.trim()}
               style={{ marginTop: spacing(2) }}
             />
-            <HeText variant="small" style={{ color: colors.textFaint, marginTop: spacing(1.5) }}>
+            <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(1.5) }}>
               השם וההתקדמות נשמרים רק במכשיר שלך. אפשר לשנות את השם בכל רגע במסך ההגדרות.
             </HeText>
           </View>
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     gap: spacing(1.5),
   },
   formCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     borderRadius: radius.lg,
     padding: spacing(2.5),
   },
@@ -139,6 +141,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing(2),
     minHeight: 56,
     fontSize: typography.body.fontSize,
-    color: colors.text,
+    color: colors.textPrimary,
   },
 });

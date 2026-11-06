@@ -6,10 +6,11 @@ import Svg, { Path } from 'react-native-svg';
 import { AppButton, Card, FadeIn, HeText, Logo, Pill, ProgressBar } from '../../src/components/ui';
 import { CategoryIcon } from '../../src/components/CategoryIcon';
 import { Elephant } from '../../src/components/Decor';
-import { Bloom, Lotus, ThaiFlag, TropicalScene } from '../../src/components/Scenery';
+import { Lotus, ThaiFlag, TrophyCup } from '../../src/components/Scenery';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { homeCategories, getCategory } from '../../src/data/categories';
 import { QUESTIONS_PER_QUIZ } from '../../src/data/questions';
-import { categoryPalette, colors, radius, shadow, spacing } from '../../src/theme';
+import { categoryPalette, colors, layout, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 
 const Chevron: React.FC<{ color: string }> = ({ color }) => (
@@ -21,7 +22,7 @@ const Chevron: React.FC<{ color: string }> = ({ color }) => (
 const MenuIcon: React.FC = () => (
   <Svg width={22} height={22} viewBox="0 0 24 24">
     {[6, 12, 18].map((y) => (
-      <Path key={y} d={`M4 ${y} H20`} stroke={colors.white} strokeWidth={2.6} strokeLinecap="round" />
+      <Path key={y} d={`M4 ${y} H20`} stroke={colors.textLight} strokeWidth={2.6} strokeLinecap="round" />
     ))}
   </Svg>
 );
@@ -44,7 +45,9 @@ export default function Home() {
       >
         {/* תפאורה טרופית וכותרת */}
         <View style={styles.hero}>
-          <TropicalScene height={290} style={StyleSheet.absoluteFill as any} />
+          <PhotoHero image="phiPhiHero" height={layout.heroHeight} dim={0.3} style={StyleSheet.absoluteFill as any} />
+          <Decoration image="palmLeaf" size={150} rotate={-18} style={{ top: -26, right: -42 }} opacity={0.95} />
+          <Decoration image="palmLeaf" size={128} rotate={24} flip style={{ top: -18, left: -36 }} opacity={0.9} />
           <View style={[styles.heroContent, { paddingTop: insets.top + spacing(1) }]}>
             <Pressable
               accessibilityRole="button"
@@ -68,30 +71,30 @@ export default function Home() {
         <View style={styles.body}>
           {/* ברכה אישית */}
           <FadeIn>
-            <Card style={styles.greetCard} color={colors.creamCard}>
+            <Card style={styles.greetCard} color={colors.warmWhite}>
               <View style={{ flex: 1 }}>
                 <HeText variant="title">שלום {progress.userName || 'חברה'}! ❤️</HeText>
-                <HeText variant="body" style={{ color: colors.textSoft }}>
+                <HeText variant="body" style={{ color: colors.textSecondary }}>
                   איזה כיף שאת כאן!
                 </HeText>
               </View>
               <Elephant size={66} />
-              <Bloom size={24} color={colors.lotus} style={{ position: 'absolute', top: 6, right: 8, opacity: 0.45 }} />
+              <Decoration image="hibiscus" size={46} style={{ bottom: -18, left: -18 }} opacity={0.95} />
             </Card>
           </FadeIn>
 
           {/* ממשיכים ללמוד */}
           {active && activeCategory && (
             <FadeIn delay={70}>
-              <Card style={{ borderWidth: 2, borderColor: colors.mango }}>
+              <Card style={{ borderWidth: 2, borderColor: colors.mangoYellow }}>
                 <Pill label="שיעור בתהליך" bg={colors.mangoSoft} fg="#8A5F00" />
                 <HeText variant="heading" style={{ marginTop: spacing(1) }}>
                   ממשיכים ללמוד: {activeCategory.titleHe}
                 </HeText>
-                <HeText variant="small" style={{ color: colors.textSoft, marginBottom: spacing(1) }}>
+                <HeText variant="small" style={{ color: colors.textSecondary, marginBottom: spacing(1) }}>
                   עצרת בשאלה {active.questionIndex + 1} מתוך {QUESTIONS_PER_QUIZ}, עם {active.score} נקודות.
                 </HeText>
-                <ProgressBar value={active.questionIndex} total={QUESTIONS_PER_QUIZ} color={colors.mango} />
+                <ProgressBar value={active.questionIndex} total={QUESTIONS_PER_QUIZ} color={colors.mangoYellow} trackColor={colors.sand} />
                 <AppButton
                   title="ממשיכים מאיפה שעצרנו"
                   variant="mango"
@@ -124,8 +127,8 @@ export default function Home() {
                     <View style={styles.catTop}>
                       <CategoryIcon name={cat.icon} size={38} />
                       {status === 'completed' && (
-                        <View style={[styles.doneDot, { backgroundColor: colors.leaf }]}>
-                          <HeText variant="tiny" style={{ color: colors.white, textAlign: 'center' }}>
+                        <View style={[styles.doneDot, { backgroundColor: colors.palmGreen }]}>
+                          <HeText variant="tiny" style={{ color: colors.textLight, textAlign: 'center' }}>
                             ✓
                           </HeText>
                         </View>
@@ -134,14 +137,14 @@ export default function Home() {
 
                     <View style={styles.catTitleRow}>
                       <View style={[styles.chev, { backgroundColor: palette.accent }]}>
-                        <Chevron color={colors.white} />
+                        <Chevron color={colors.textLight} />
                       </View>
-                      <HeText variant="heading" numberOfLines={1} style={{ flex: 1, fontSize: 16 }}>
+                      <HeText variant="heading" numberOfLines={2} style={{ flex: 1, fontSize: 15, lineHeight: 21 }}>
                         {cat.titleHe}
                       </HeText>
                     </View>
 
-                    <HeText variant="small" style={{ color: colors.textSoft }} numberOfLines={1}>
+                    <HeText variant="small" style={{ color: colors.textSecondary, fontSize: 13 }} numberOfLines={2}>
                       {cat.descriptionHe}
                     </HeText>
 
@@ -149,7 +152,7 @@ export default function Home() {
                       value={best}
                       total={QUESTIONS_PER_QUIZ}
                       color={palette.accent}
-                      trackColor={colors.white}
+                      trackColor={colors.textLight}
                       height={7}
                     />
                   </Pressable>
@@ -160,21 +163,21 @@ export default function Home() {
 
           {/* ההתקדמות שלך */}
           <FadeIn delay={440}>
-            <Card color={colors.creamCard} style={styles.progressCard}>
+            <Card color={colors.warmWhite} style={styles.progressCard}>
               <View style={styles.trophyBubble}>
-                <HeText style={{ fontSize: 26, textAlign: 'center' }}>🏆</HeText>
+                <TrophyCup size={40} />
               </View>
               <View style={{ flex: 1, gap: spacing(0.5) }}>
                 <HeText variant="heading" style={{ fontSize: 16 }}>
                   ההתקדמות שלך
                 </HeText>
-                <ProgressBar value={bestPoints} total={maxPoints} color={colors.pink} height={11} />
-                <HeText variant="tiny" style={{ color: colors.textSoft }}>
+                <ProgressBar value={bestPoints} total={maxPoints} color={colors.lotusPink} height={11} trackColor={colors.sand} />
+                <HeText variant="tiny" style={{ color: colors.textSecondary }}>
                   {bestPoints}/{maxPoints} נקודות
                 </HeText>
               </View>
               <View style={styles.stageBadge}>
-                <HeText variant="tiny" style={{ color: colors.white, textAlign: 'center' }}>
+                <HeText variant="tiny" style={{ color: colors.textLight, textAlign: 'center' }}>
                   ⭐ שלב {stage}
                 </HeText>
               </View>
@@ -187,7 +190,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  hero: { height: 290, overflow: 'hidden' },
+  hero: { height: layout.heroHeight, overflow: 'hidden' },
   heroContent: { flex: 1, paddingHorizontal: spacing(2) },
   menuBtn: {
     position: 'absolute',
@@ -196,7 +199,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: colors.pink,
+    backgroundColor: colors.lotusPink,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 3,
@@ -206,10 +209,11 @@ const styles = StyleSheet.create({
   flag: { marginRight: -8, marginBottom: 22 },
   body: {
     paddingHorizontal: spacing(2),
-    marginTop: -spacing(7),
+    marginTop: -spacing(5.5),
     gap: spacing(1.5),
   },
   greetCard: {
+    overflow: 'visible',
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing(1.25),
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: spacing(1.25),
     gap: spacing(0.65),
-    minHeight: 132,
+    minHeight: 146,
   },
   catTop: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
   catTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(0.75) },
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stageBadge: {
-    backgroundColor: colors.pink,
+    backgroundColor: colors.lotusPink,
     borderRadius: radius.pill,
     paddingHorizontal: spacing(1.1),
     paddingVertical: spacing(0.6),

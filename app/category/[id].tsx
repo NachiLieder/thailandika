@@ -5,11 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, Card, FadeIn, HeText, Pill, ProgressBar, ThaiLabel } from '../../src/components/ui';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { CategoryIcon } from '../../src/components/CategoryIcon';
-import { Hibiscus, PalmLeaf } from '../../src/components/Decor';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { getCategory } from '../../src/data/categories';
 import { getLessonItems } from '../../src/data/items';
 import { getQuestionsByCategory, QUESTIONS_PER_QUIZ } from '../../src/data/questions';
-import { categoryPalette, colors, radius, shadow, spacing } from '../../src/theme';
+import { categoryPalette, categoryPhoto, colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 
 export default function CategoryScreen() {
@@ -27,7 +27,7 @@ export default function CategoryScreen() {
         <View style={{ padding: spacing(2) }}>
           <Card>
             <HeText variant="heading">אופס, לא מצאנו את השיעור הזה</HeText>
-            <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+            <HeText variant="body" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
               אפשר לחזור למסך הבית ולבחור קטגוריה אחרת.
             </HeText>
             <AppButton title="חזרה לבית" style={{ marginTop: spacing(2) }} onPress={() => router.replace('/(tabs)')} />
@@ -49,9 +49,14 @@ export default function CategoryScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
-      <View style={[styles.hero, { backgroundColor: palette.bg }]}>
-        <PalmLeaf size={140} style={{ position: 'absolute', top: -26, left: -44, opacity: 0.3 }} />
-        <Hibiscus size={48} style={{ position: 'absolute', bottom: 8, left: 14, opacity: 0.35 }} />
+      <View style={styles.hero}>
+        <PhotoHero
+          image={categoryPhoto[category.id] ?? 'cardTemple'}
+          height={150}
+          tone="cream" dim={0.42}
+          style={StyleSheet.absoluteFill as any}
+        />
+        <Decoration image="palmLeaf" size={104} rotate={20} flip style={{ top: -16, left: -28 }} opacity={0.8} />
         <ScreenHeader title={category.titleHe} subtitle={category.descriptionHe} />
       </View>
 
@@ -62,7 +67,7 @@ export default function CategoryScreen() {
               <CategoryIcon name={category.icon} size={62} />
               <View style={{ flex: 1 }}>
                 <HeText variant="heading">מה לומדים כאן?</HeText>
-                <HeText variant="small" style={{ color: colors.textSoft }}>
+                <HeText variant="small" style={{ color: colors.textSecondary }}>
                   {category.longDescriptionHe}
                 </HeText>
               </View>
@@ -80,17 +85,17 @@ export default function CategoryScreen() {
               <HeText variant="heading">יחידה 1 · {category.titleHe}</HeText>
               <Pill
                 label={statusLabel}
-                bg={status === 'completed' ? colors.leafSoft : status === 'in-progress' ? colors.mangoSoft : colors.lotusSoft}
-                fg={status === 'completed' ? colors.leaf : status === 'in-progress' ? '#8A5F00' : colors.pinkDeep}
+                bg={status === 'completed' ? colors.successSoft : status === 'in-progress' ? colors.mangoSoft : colors.lotusSoft}
+                fg={status === 'completed' ? colors.palmGreen : status === 'in-progress' ? '#8A5F00' : colors.lotusDark}
               />
             </View>
-            <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+            <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
               {items.length} כרטיסי לימוד · {questions.length} שאלות בחידון
             </HeText>
 
             <View style={{ marginTop: spacing(1.5) }}>
-              <ProgressBar value={best} total={QUESTIONS_PER_QUIZ} color={palette.accent} />
-              <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.75) }}>
+              <ProgressBar value={best} total={QUESTIONS_PER_QUIZ} color={palette.accent} trackColor={colors.sand} />
+              <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(0.75) }}>
                 {last
                   ? `הציון האחרון שלך: ${last.score} מתוך ${last.total} · השיא שלך: ${best}/${QUESTIONS_PER_QUIZ}`
                   : 'עוד לא ענית על החידון הזה.'}
@@ -126,13 +131,13 @@ export default function CategoryScreen() {
             {items.slice(0, 4).map((item) => (
               <View key={item.id} style={[styles.peekCard, shadow(1)]}>
                 <ThaiLabel size="small">{item.thai}</ThaiLabel>
-                <HeText variant="tiny" style={{ color: colors.textSoft, textAlign: 'center' }}>
+                <HeText variant="tiny" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                   {item.meaningHe}
                 </HeText>
               </View>
             ))}
           </View>
-          <HeText variant="small" style={{ color: colors.textFaint, marginTop: spacing(1) }}>
+          <HeText variant="small" style={{ color: colors.textSecondary, marginTop: spacing(1) }}>
             ועוד {Math.max(0, items.length - 4)} מילים בתוך השיעור.
           </HeText>
         </FadeIn>
@@ -142,7 +147,7 @@ export default function CategoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: 'hidden', paddingBottom: spacing(1) },
+  hero: { height: 150, overflow: 'hidden', justifyContent: 'flex-end', paddingBottom: spacing(1) },
   body: { paddingHorizontal: spacing(2), paddingTop: spacing(2), gap: spacing(1.5) },
   introCard: {},
   introRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1.5) },
@@ -154,7 +159,7 @@ const styles = StyleSheet.create({
   },
   peekWrap: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing(1) },
   peekCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.textLight,
     borderRadius: radius.md,
     paddingVertical: spacing(1.25),
     paddingHorizontal: spacing(1.5),

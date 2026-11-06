@@ -5,10 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, Card, FadeIn, HeText, Pill, ProgressBar, ThaiLabel } from '../../src/components/ui';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { AudioButton } from '../../src/components/AudioButton';
-import { Elephant, Hibiscus, PalmLeaf } from '../../src/components/Decor';
+import { Elephant } from '../../src/components/Decor';
+import { Decoration, PhotoHero } from '../../src/components/Photo';
 import { getCategory } from '../../src/data/categories';
 import { getLessonItems } from '../../src/data/items';
-import { categoryPalette, colors, radius, shadow, spacing } from '../../src/theme';
+import { categoryPalette, categoryPhoto, colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 import { useStudyTimer } from '../../src/state/useStudyTimer';
 import { stopAllAudio } from '../../src/audio/useSpeech';
@@ -40,7 +41,7 @@ export default function LessonScreen() {
         <View style={{ padding: spacing(2) }}>
           <Card>
             <HeText variant="heading">לא מצאנו כרטיסי לימוד ליחידה הזו</HeText>
-            <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+            <HeText variant="body" style={{ color: colors.textSecondary, marginTop: spacing(0.5) }}>
               אפשר לחזור לבית ולנסות קטגוריה אחרת.
             </HeText>
             <AppButton title="חזרה לבית" style={{ marginTop: spacing(2) }} onPress={() => router.replace('/(tabs)')} />
@@ -56,8 +57,14 @@ export default function LessonScreen() {
   if (ready) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.cream }}>
-        <View style={[styles.hero, { backgroundColor: palette.bg }]}>
-          <PalmLeaf size={140} style={{ position: 'absolute', top: -26, left: -44, opacity: 0.3 }} />
+        <View style={styles.hero}>
+          <PhotoHero
+            image={categoryPhoto[category.id] ?? 'cardTemple'}
+            height={166}
+            tone="cream" dim={0.42}
+            style={StyleSheet.absoluteFill as any}
+          />
+          <Decoration image="palmLeaf" size={100} rotate={20} flip style={{ top: -14, left: -26 }} opacity={0.8} />
           <ScreenHeader title={category.titleHe} subtitle="סיימנו את כרטיסי הלימוד" onBack={() => setReady(false)} />
         </View>
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + spacing(4) }]}>
@@ -67,7 +74,7 @@ export default function LessonScreen() {
               <HeText variant="title" style={{ textAlign: 'center' }}>
                 מוכנה לבדוק מה למדת?
               </HeText>
-              <HeText variant="body" style={{ color: colors.textSoft, textAlign: 'center' }}>
+              <HeText variant="body" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                 עשר שאלות קצרות. טעות היא לא נורא – פשוט מנסים שוב באותה שאלה.
               </HeText>
               <AppButton
@@ -99,12 +106,17 @@ export default function LessonScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
-      <View style={[styles.hero, { backgroundColor: palette.bg }]}>
-        <PalmLeaf size={140} style={{ position: 'absolute', top: -26, left: -44, opacity: 0.3 }} />
-        <Hibiscus size={46} style={{ position: 'absolute', bottom: 6, left: 12, opacity: 0.35 }} />
+      <View style={styles.hero}>
+        <PhotoHero
+          image={categoryPhoto[category.id] ?? 'cardTemple'}
+          height={162}
+          tone="cream" dim={0.42}
+          style={StyleSheet.absoluteFill as any}
+        />
+        <Decoration image="palmLeaf" size={100} rotate={20} flip style={{ top: -14, left: -26 }} opacity={0.8} />
         <ScreenHeader title={category.titleHe} subtitle={`כרטיס ${index + 1} מתוך ${items.length}`} />
         <View style={{ paddingHorizontal: spacing(2), paddingBottom: spacing(1.5) }}>
-          <ProgressBar value={index + 1} total={items.length} color={palette.accent} trackColor={colors.white} />
+          <ProgressBar value={index + 1} total={items.length} color={palette.accent} trackColor={colors.sand} />
         </View>
       </View>
 
@@ -118,16 +130,16 @@ export default function LessonScreen() {
             </View>
 
             <View style={styles.translitBox}>
-              <HeText variant="tiny" style={{ color: colors.textFaint, textAlign: 'center' }}>
+              <HeText variant="tiny" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                 תעתיק עברי מקורב
               </HeText>
-              <HeText variant="title" style={{ textAlign: 'center', color: colors.pinkDeep }}>
+              <HeText variant="title" style={{ textAlign: 'center', color: colors.lotusDark }}>
                 {item.transliterationHe}
               </HeText>
             </View>
 
             <View style={{ alignItems: 'center', gap: spacing(0.25) }}>
-              <HeText variant="tiny" style={{ color: colors.textFaint, textAlign: 'center' }}>
+              <HeText variant="tiny" style={{ color: colors.textSecondary, textAlign: 'center' }}>
                 משמעות
               </HeText>
               <HeText variant="title" style={{ textAlign: 'center' }}>
@@ -137,7 +149,7 @@ export default function LessonScreen() {
 
             <AudioButton thai={item.thai} itemId={item.id} style={{ marginTop: spacing(1) }} />
 
-            <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+            <HeText variant="small" style={{ color: colors.textSecondary, textAlign: 'center' }}>
               🔊 הקשיבי וחזרי בקול אחרי ההשמעה.
             </HeText>
 
@@ -149,7 +161,7 @@ export default function LessonScreen() {
               </View>
             )}
 
-            <HeText variant="tiny" style={{ color: colors.textFaint }}>
+            <HeText variant="tiny" style={{ color: colors.textSecondary }}>
               התעתיק העברי הוא קירוב בלבד. בתאילנדית יש טונים וצלילים שאי אפשר לייצג במדויק בעברית – כדאי להישען על ההשמעה.
             </HeText>
           </Card>
@@ -193,7 +205,7 @@ export default function LessonScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: 'hidden' },
+  hero: { height: 166, overflow: 'hidden', justifyContent: 'flex-end' },
   body: { paddingHorizontal: spacing(2), paddingTop: spacing(2), gap: spacing(2) },
   flashCard: { gap: spacing(1.5), paddingVertical: spacing(2.5) },
   thaiBox: {

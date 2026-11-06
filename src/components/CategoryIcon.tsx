@@ -20,8 +20,8 @@ export const CategoryIcon: React.FC<Props> = ({ name, size = 56, style }) => {
         )}
         {name === 'chat' && (
           <G>
-            <Rect x="8" y="22" width="56" height="40" rx="14" fill={colors.lotus} />
-            <Path d="M22 62 L20 78 L38 62 Z" fill={colors.lotus} />
+            <Rect x="8" y="22" width="56" height="40" rx="14" fill={colors.lotusPink} />
+            <Path d="M22 62 L20 78 L38 62 Z" fill={colors.lotusPink} />
             <Circle cx="26" cy="42" r="4" fill="#FFF" />
             <Circle cx="38" cy="42" r="4" fill="#FFF" />
             <Circle cx="50" cy="42" r="4" fill="#FFF" />
@@ -36,8 +36,8 @@ export const CategoryIcon: React.FC<Props> = ({ name, size = 56, style }) => {
             <Path d="M28 52 Q38 44 48 52 Q58 44 68 52" stroke="#E86A4A" strokeWidth={5} fill="none" strokeLinecap="round" />
             <Circle cx="38" cy="58" r="5" fill="#F7E6B8" />
             <Circle cx="60" cy="60" r="5" fill="#F7E6B8" />
-            <Path d="M72 26 L84 18" stroke={colors.leaf} strokeWidth={5} strokeLinecap="round" />
-            <Ellipse cx="68" cy="30" rx="10" ry="5" fill={colors.leaf} transform="rotate(-25 68 30)" />
+            <Path d="M72 26 L84 18" stroke={colors.palmGreen} strokeWidth={5} strokeLinecap="round" />
+            <Ellipse cx="68" cy="30" rx="10" ry="5" fill={colors.palmGreen} transform="rotate(-25 68 30)" />
           </G>
         )}
         {name === 'temple' && (
@@ -52,18 +52,18 @@ export const CategoryIcon: React.FC<Props> = ({ name, size = 56, style }) => {
         )}
         {name === 'numbers' && (
           <G>
-            <SvgText x="14" y="62" fontSize="42" fontWeight="bold" fill={colors.lotus}>1</SvgText>
+            <SvgText x="14" y="62" fontSize="42" fontWeight="bold" fill={colors.lotusPink}>1</SvgText>
             <SvgText x="36" y="70" fontSize="42" fontWeight="bold" fill={colors.turquoise}>2</SvgText>
             <SvgText x="62" y="56" fontSize="42" fontWeight="bold" fill="#E9A62B">3</SvgText>
           </G>
         )}
         {name === 'game' && (
           <G>
-            <Rect x="10" y="34" width="80" height="40" rx="20" fill="#F0ECF7" stroke={colors.violet} strokeWidth={3} />
-            <Rect x="24" y="50" width="16" height="5" rx="2.5" fill={colors.violet} />
-            <Rect x="29.5" y="44.5" width="5" height="16" rx="2.5" fill={colors.violet} />
-            <Circle cx="66" cy="48" r="5" fill={colors.lotus} />
-            <Circle cx="76" cy="58" r="5" fill={colors.mango} />
+            <Rect x="10" y="34" width="80" height="40" rx="20" fill="#F0ECF7" stroke={colors.lavender} strokeWidth={3} />
+            <Rect x="24" y="50" width="16" height="5" rx="2.5" fill={colors.lavender} />
+            <Rect x="29.5" y="44.5" width="5" height="16" rx="2.5" fill={colors.lavender} />
+            <Circle cx="66" cy="48" r="5" fill={colors.lotusPink} />
+            <Circle cx="76" cy="58" r="5" fill={colors.mangoYellow} />
             <Circle cx="66" cy="60" r="4" fill={colors.turquoise} />
           </G>
         )}
