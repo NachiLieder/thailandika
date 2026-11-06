@@ -3,7 +3,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, TextInput, 
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, Card, FadeIn, HeText, Pill } from '../../src/components/ui';
-import { Hibiscus, PalmLeaf, Wave } from '../../src/components/Decor';
+import { TropicalScene } from '../../src/components/Scenery';
 import { colors, he, radius, shadow, spacing, typography } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 import { missingAudioItems } from '../../src/data/items';
@@ -60,15 +60,17 @@ export default function SettingsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing(12) }}>
-        <View style={[styles.hero, { paddingTop: insets.top + spacing(2) }]}>
-          <PalmLeaf size={130} style={{ position: 'absolute', top: -24, left: -42, opacity: 0.3 }} />
-          <Hibiscus size={44} style={{ position: 'absolute', top: 38, right: 18, opacity: 0.45 }} />
-          <Wave width={900} height={34} style={{ position: 'absolute', bottom: -2, left: 0 }} />
-          <View style={{ paddingHorizontal: spacing(2), paddingBottom: spacing(4) }}>
-            <HeText variant="display">הגדרות</HeText>
-            <HeText variant="body" style={{ color: colors.textSoft }}>
-              הכול נשמר במכשיר שלך בלבד.
-            </HeText>
+        <View style={styles.hero}>
+          <TropicalScene height={210} style={StyleSheet.absoluteFill as any} />
+          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(2) }]}>
+            <View style={styles.heroPlate}>
+              <HeText variant="title" style={{ color: colors.pinkDeep, textAlign: 'center' }}>
+                ⚙️ עוד והגדרות
+              </HeText>
+              <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+                הכול נשמר במכשיר שלך בלבד.
+              </HeText>
+            </View>
           </View>
         </View>
 
@@ -182,7 +184,7 @@ export default function SettingsScreen() {
           </FadeIn>
 
           <FadeIn delay={260}>
-            <Card color={colors.turquoiseSoft}>
+            <Card color={colors.turquoiseSoft} style={{ borderWidth: 2, borderColor: colors.turquoiseLight }}>
               <HeText variant="heading">על האפליקציה</HeText>
               <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
                 תאילנדיקה · גרסה 1.0{'\n'}
@@ -209,8 +211,17 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { backgroundColor: colors.turquoiseLight, overflow: 'hidden' },
-  body: { paddingHorizontal: spacing(2), marginTop: -spacing(2), gap: spacing(1.5) },
+  hero: { height: 210, overflow: 'hidden' },
+  heroContent: { flex: 1, alignItems: 'center', paddingHorizontal: spacing(2) },
+  heroPlate: {
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing(2.5),
+    paddingVertical: spacing(1),
+    borderWidth: 2,
+    borderColor: colors.lotusMid,
+  },
+  body: { paddingHorizontal: spacing(2), marginTop: -spacing(4), gap: spacing(1.25) },
   input: {
     marginTop: spacing(1),
     borderWidth: 2,

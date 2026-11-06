@@ -17,7 +17,7 @@ import {
   validateProgress,
   validateSettings,
 } from '../storage/storage';
-import { ActiveQuiz, AppSettings, QuizResult, UserProgress } from '../data/types';
+import { ActiveQuiz, AppSettings, Badge, QuizResult, UserProgress } from '../data/types';
 import { CATEGORIES } from '../data/categories';
 import { QUESTIONS_PER_QUIZ } from '../data/questions';
 
@@ -31,6 +31,13 @@ type AppStateValue = {
   completeQuiz: (categoryId: string, score: number) => Promise<QuizResult>;
   updateSettings: (patch: Partial<AppSettings>) => Promise<void>;
   resetProgress: () => Promise<void>;
+  recordStudyTime: (seconds: number) => void;
+  badges: Badge[];
+  minutesToday: number;
+  streakDays: number;
+  overallPercent: number;
+  bestPoints: number;
+  maxPoints: number;
   lastResultFor: (categoryId: string) => QuizResult | undefined;
   bestScoreFor: (categoryId: string) => number;
   categoryStatus: (categoryId: string) => 'new' | 'in-progress' | 'completed';
@@ -39,6 +46,27 @@ type AppStateValue = {
 };
 
 const AppStateContext = createContext<AppStateValue | null>(null);
+
+const toKey = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const daysBetween = (a: string, b: string) => {
+  const [ay, am, ad] = a.split('-').map(Number);
+  const [by, bm, bd] = b.split('-').map(Number);
+  const da = Date.UTC(ay, am - 1, ad);
+  const db = Date.UTC(by, bm - 1, bd);
+  return Math.round((db - da) / 86400000);
+};
+
+/** שומר רק את 14 הימים האחרונים, כדי שהאחסון לא יגדל בלי גבול */
+const trimStudySeconds = (map: Record<string, number>, today: string) => {
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(map)) {
+    const diff = daysBetween(key, today);
+    if (diff >= 0 && diff < 14) out[key] = value;
+  }
+  return out;
+};
 
 export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [ready, setReady] = useState(false);
@@ -55,7 +83,21 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         loadJSON(KEYS.settings, validateSettings),
       ]);
       if (!alive) return;
-      setProgress(p);
+      const today = toKey(new Date());
+      let next = p;
+      if (p.lastActiveDate !== today) {
+        const gap = p.lastActiveDate ? daysBetween(p.lastActiveDate, today) : null;
+        const streakDays = gap === 1 ? p.streakDays + 1 : 1;
+        next = {
+          ...p,
+          lastActiveDate: today,
+          streakDays,
+          studySeconds: trimStudySeconds(p.studySeconds, today),
+        };
+        void saveJSON(KEYS.progress, next);
+      }
+      progressRef.current = next;
+      setProgress(next);
       setSettings(s);
       setReady(true);
     })();
@@ -86,6 +128,21 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const current = progressRef.current;
       if (current.viewedItemIds.includes(itemId)) return;
       persist({ ...current, viewedItemIds: [...current.viewedItemIds, itemId] });
+    },
+    [persist],
+  );
+
+  /** נצבר בזמן שהמשתמשת נמצאת במסך לימוד או חידון */
+  const recordStudyTime = useCallback(
+    (seconds: number) => {
+      if (seconds <= 0) return;
+      const current = progressRef.current;
+      const today = toKey(new Date());
+      const prev = current.studySeconds[today] ?? 0;
+      persist({
+        ...current,
+        studySeconds: { ...current.studySeconds, [today]: prev + Math.round(seconds) },
+      });
     },
     [persist],
   );
@@ -171,6 +228,53 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const completedLessons = progress.completedCategoryIds.length;
 
+  const maxPoints = CATEGORIES.length * QUESTIONS_PER_QUIZ;
+  const bestPoints = useMemo(
+    () =>
+      CATEGORIES.reduce(
+        (sum, c) =>
+          sum +
+          progress.results
+            .filter((r) => r.categoryId === c.id)
+            .reduce((max, r) => Math.max(max, r.score), 0),
+        0,
+      ),
+    [progress.results],
+  );
+  const overallPercent = maxPoints > 0 ? Math.round((bestPoints / maxPoints) * 100) : 0;
+
+  const minutesToday = useMemo(() => {
+    const today = toKey(new Date());
+    return Math.round((progress.studySeconds[today] ?? 0) / 60);
+  }, [progress.studySeconds]);
+
+  const badges = useMemo<Badge[]>(
+    () => [
+      {
+        id: 'beginner',
+        titleHe: 'לומדת מתחילה',
+        descriptionHe: 'סיימת את השיעור הראשון שלך',
+        tone: 'rose',
+        unlocked: progress.completedCategoryIds.length >= 1,
+      },
+      {
+        id: 'wordster',
+        titleHe: 'מוכרת מילים',
+        descriptionHe: 'למדת 20 מילים וביטויים',
+        tone: 'gold',
+        unlocked: progress.viewedItemIds.length >= 20,
+      },
+      {
+        id: 'quizChampion',
+        titleHe: 'אלופת חידונים',
+        descriptionHe: 'השגת ציון מושלם של 10 מתוך 10',
+        tone: 'violet',
+        unlocked: progress.results.some((r) => r.score >= QUESTIONS_PER_QUIZ),
+      },
+    ],
+    [progress.completedCategoryIds.length, progress.viewedItemIds.length, progress.results],
+  );
+
   const value = useMemo<AppStateValue>(
     () => ({
       ready,
@@ -178,6 +282,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       settings,
       setUserName,
       markItemViewed,
+      recordStudyTime,
       saveActiveQuiz,
       completeQuiz,
       updateSettings,
@@ -187,6 +292,12 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       categoryStatus,
       totalCorrect,
       completedLessons,
+      badges,
+      minutesToday,
+      streakDays: progress.streakDays,
+      overallPercent,
+      bestPoints,
+      maxPoints,
     }),
     [
       ready,
@@ -194,6 +305,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       settings,
       setUserName,
       markItemViewed,
+      recordStudyTime,
       saveActiveQuiz,
       completeQuiz,
       updateSettings,
@@ -203,6 +315,11 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       categoryStatus,
       totalCorrect,
       completedLessons,
+      badges,
+      minutesToday,
+      overallPercent,
+      bestPoints,
+      maxPoints,
     ],
   );
 

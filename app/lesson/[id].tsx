@@ -10,6 +10,7 @@ import { getCategory } from '../../src/data/categories';
 import { getLessonItems } from '../../src/data/items';
 import { categoryPalette, colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
+import { useStudyTimer } from '../../src/state/useStudyTimer';
 import { stopAllAudio } from '../../src/audio/useSpeech';
 
 export default function LessonScreen() {
@@ -17,6 +18,7 @@ export default function LessonScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { markItemViewed } = useAppState();
+  useStudyTimer();
 
   const category = getCategory(id);
   const items = category ? getLessonItems(category.id) : [];
@@ -119,7 +121,7 @@ export default function LessonScreen() {
               <HeText variant="tiny" style={{ color: colors.textFaint, textAlign: 'center' }}>
                 תעתיק עברי מקורב
               </HeText>
-              <HeText variant="title" style={{ textAlign: 'center', color: colors.turquoise }}>
+              <HeText variant="title" style={{ textAlign: 'center', color: colors.pinkDeep }}>
                 {item.transliterationHe}
               </HeText>
             </View>

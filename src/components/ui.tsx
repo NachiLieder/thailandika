@@ -68,7 +68,7 @@ export const Card: React.FC<{
 type ButtonProps = {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'mango';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'mango' | 'turquoise';
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
@@ -91,9 +91,10 @@ export const AppButton: React.FC<ButtonProps> = ({
     Animated.spring(scale, { toValue: to, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
 
   const palette: Record<string, { bg: string; fg: string; border?: string }> = {
-    primary: { bg: colors.turquoise, fg: colors.white },
-    mango: { bg: colors.mango, fg: '#4A3508' },
-    secondary: { bg: colors.white, fg: colors.turquoise, border: colors.turquoise },
+    primary: { bg: colors.pink, fg: colors.white },
+    mango: { bg: colors.mango, fg: '#543B05' },
+    turquoise: { bg: colors.turquoise, fg: colors.white },
+    secondary: { bg: colors.white, fg: colors.pink, border: colors.pink },
     ghost: { bg: 'transparent', fg: colors.textSoft },
     danger: { bg: colors.errorSoft, fg: colors.error, border: colors.error },
   };
@@ -183,15 +184,20 @@ export const Pill: React.FC<{ label: string; bg?: string; fg?: string; style?: V
 
 export const Logo: React.FC<{ compact?: boolean }> = ({ compact }) => (
   <View style={{ alignItems: 'center' }}>
-    <View style={[styles.logoPlate, shadow(2), compact && { paddingVertical: spacing(1) }]}>
+    <View style={[styles.logoPlate, shadow(2), compact && styles.logoPlateCompact]}>
+      <View style={styles.logoScallopRow}>
+        {Array.from({ length: 11 }).map((_, i) => (
+          <View key={i} style={styles.scallop} />
+        ))}
+      </View>
       <Text
         style={[
           he,
           {
             textAlign: 'center',
-            color: '#C2185B',
-            fontSize: compact ? 26 : 38,
-            lineHeight: compact ? 38 : 52,
+            color: colors.pinkDeep,
+            fontSize: compact ? 24 : 36,
+            lineHeight: compact ? 34 : 48,
             fontWeight: '900',
           },
         ]}
@@ -200,11 +206,33 @@ export const Logo: React.FC<{ compact?: boolean }> = ({ compact }) => (
         תאילנדיקה
       </Text>
       {!compact && (
-        <Text style={[he, typography.small, { textAlign: 'center', color: colors.textSoft }]} allowFontScaling>
-          מתחילים לדבר תאילנדית
+        <Text
+          style={[he, typography.small, { textAlign: 'center', color: colors.pink, marginTop: -2 }]}
+          allowFontScaling
+        >
+          לומדים תאילנדית בכיף
         </Text>
       )}
+      <View style={styles.logoScallopRowBottom}>
+        {Array.from({ length: 11 }).map((_, i) => (
+          <View key={i} style={styles.scallop} />
+        ))}
+      </View>
     </View>
+  </View>
+);
+
+/** כותרת מקטע עם אימוג'י, כמו במוקאפ */
+export const SectionTitle: React.FC<{ title: string; emoji?: string; style?: ViewStyle }> = ({
+  title,
+  emoji,
+  style,
+}) => (
+  <View style={[{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }, style]}>
+    <Text style={[he, typography.heading]} allowFontScaling>
+      {title}
+    </Text>
+    {!!emoji && <Text style={{ fontSize: 17 }}>{emoji}</Text>}
   </View>
 );
 
@@ -256,11 +284,33 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   logoPlate: {
-    backgroundColor: '#FFF4E2',
+    backgroundColor: colors.creamCard,
     borderRadius: radius.lg,
     borderWidth: 3,
-    borderColor: '#F6D9A8',
-    paddingHorizontal: spacing(4),
-    paddingVertical: spacing(1.5),
+    borderColor: colors.lotusMid,
+    paddingHorizontal: spacing(3.5),
+    paddingVertical: spacing(1.25),
+  },
+  logoPlateCompact: {
+    paddingVertical: spacing(0.75),
+    paddingHorizontal: spacing(2.5),
+  },
+  logoScallopRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 3,
+    marginBottom: 4,
+  },
+  logoScallopRowBottom: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 3,
+    marginTop: 4,
+  },
+  scallop: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.lotusMid,
   },
 });

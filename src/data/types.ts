@@ -63,6 +63,22 @@ export type UserProgress = {
   results: QuizResult[];
   activeQuiz: ActiveQuiz;
   viewedItemIds: string[];
+  /** תאריך הפעילות האחרון, בפורמט YYYY-MM-DD */
+  lastActiveDate: string | null;
+  /** רצף ימי לימוד */
+  streakDays: number;
+  /** שניות לימוד לפי תאריך; נשמרים 14 הימים האחרונים */
+  studySeconds: Record<string, number>;
+};
+
+export type BadgeId = 'beginner' | 'wordster' | 'quizChampion';
+
+export type Badge = {
+  id: BadgeId;
+  titleHe: string;
+  descriptionHe: string;
+  tone: 'gold' | 'rose' | 'violet';
+  unlocked: boolean;
 };
 
 export type AppSettings = {

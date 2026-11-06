@@ -6,25 +6,33 @@ import Svg, { Path, Circle, Rect } from 'react-native-svg';
 import { colors, radius, shadow, spacing, typography } from '../../src/theme';
 import { stopAllAudio } from '../../src/audio/useSpeech';
 
-const HomeIcon: React.FC<{ color: string }> = ({ color }) => (
-  <Svg width={26} height={26} viewBox="0 0 24 24">
-    <Path d="M3 11 L12 3 L21 11 V21 H14 V15 H10 V21 H3 Z" fill={color} />
+type IconProps = { color: string };
+
+const HomeIcon: React.FC<IconProps> = ({ color }) => (
+  <Svg width={25} height={25} viewBox="0 0 24 24">
+    <Path d="M3 11 L12 3 L21 11 V21 H14.5 V15 H9.5 V21 H3 Z" fill={color} />
   </Svg>
 );
-const ChartIcon: React.FC<{ color: string }> = ({ color }) => (
-  <Svg width={26} height={26} viewBox="0 0 24 24">
-    <Rect x="3" y="12" width="4.5" height="9" rx="2" fill={color} />
-    <Rect x="9.75" y="7" width="4.5" height="14" rx="2" fill={color} />
-    <Rect x="16.5" y="3" width="4.5" height="18" rx="2" fill={color} />
+const TrophyIcon: React.FC<IconProps> = ({ color }) => (
+  <Svg width={25} height={25} viewBox="0 0 24 24">
+    <Path d="M7 3 h10 v6 a5 5 0 0 1 -10 0 Z" fill={color} />
+    <Path d="M7 4 C4 4 3.5 9 7 10" stroke={color} strokeWidth={1.8} fill="none" strokeLinecap="round" />
+    <Path d="M17 4 C20 4 20.5 9 17 10" stroke={color} strokeWidth={1.8} fill="none" strokeLinecap="round" />
+    <Rect x="10.8" y="13.5" width="2.4" height="4" fill={color} />
+    <Rect x="7.5" y="17.5" width="9" height="2.6" rx="1.3" fill={color} />
   </Svg>
 );
-const GearIcon: React.FC<{ color: string }> = ({ color }) => (
-  <Svg width={26} height={26} viewBox="0 0 24 24">
-    <Path
-      d="M12 2 l2 3 h3.5 l.5 3.5 3 2 -3 2 -.5 3.5 H14 l-2 3 -2-3 H6.5 L6 12.5 l-3-2 3-2 L6.5 5 H10 Z"
-      fill={color}
-    />
-    <Circle cx="12" cy="11.5" r="3.2" fill={colors.cream} />
+const PersonIcon: React.FC<IconProps> = ({ color }) => (
+  <Svg width={25} height={25} viewBox="0 0 24 24">
+    <Circle cx="12" cy="7.8" r="4.2" fill={color} />
+    <Path d="M3.8 21 C4.6 15.8 8 13.6 12 13.6 C16 13.6 19.4 15.8 20.2 21 Z" fill={color} />
+  </Svg>
+);
+const MoreIcon: React.FC<IconProps> = ({ color }) => (
+  <Svg width={25} height={25} viewBox="0 0 24 24">
+    <Circle cx="5.5" cy="12" r="2.1" fill={color} />
+    <Circle cx="12" cy="12" r="2.1" fill={color} />
+    <Circle cx="18.5" cy="12" r="2.1" fill={color} />
   </Svg>
 );
 
@@ -33,59 +41,39 @@ type TabBarProps = {
   navigateToTab: (routeKey: string) => void;
 };
 
-/** סרגל ניווט תחתון בכיווניות RTL, עם כפתור "בית" מורם במרכז */
+/** סרגל ניווט תחתון בכיווניות RTL: בית · הישגים · הפרופיל · עוד */
 function TabBar({ state, navigateToTab }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const tabs = [
-    { name: 'progress', label: 'ההתקדמות', Icon: ChartIcon },
-    { name: 'index', label: 'בית', Icon: HomeIcon, center: true },
-    { name: 'settings', label: 'הגדרות', Icon: GearIcon },
+    { name: 'index', label: 'בית', Icon: HomeIcon },
+    { name: 'achievements', label: 'הישגים', Icon: TrophyIcon },
+    { name: 'profile', label: 'הפרופיל', Icon: PersonIcon },
+    { name: 'more', label: 'עוד', Icon: MoreIcon },
   ];
 
   return (
     <View style={[styles.bar, shadow(3), { paddingBottom: Math.max(insets.bottom, spacing(1)) }]}>
-      {tabs.map(({ name, label, Icon, center }) => {
+      {tabs.map(({ name, label, Icon }) => {
         const routeIndex = state.routes.findIndex((r) => r.name === name);
         const route = state.routes[routeIndex];
         const focused = state.index === routeIndex;
-        const onPress = () => {
-          stopAllAudio();
-          if (!focused && route) navigateToTab(route.key);
-        };
-
-        if (center) {
-          return (
-            <Pressable
-              key={name}
-              onPress={onPress}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: focused }}
-              accessibilityLabel={label}
-              style={styles.centerWrap}
-            >
-              <View style={[styles.centerBtn, shadow(2), focused && { backgroundColor: colors.turquoise }]}>
-                <Icon color={colors.white} />
-              </View>
-              <Text style={[styles.label, focused && styles.labelActive]} allowFontScaling>
-                {label}
-              </Text>
-            </Pressable>
-          );
-        }
-
         return (
           <Pressable
             key={name}
-            onPress={onPress}
             accessibilityRole="tab"
             accessibilityState={{ selected: focused }}
             accessibilityLabel={label}
+            onPress={() => {
+              stopAllAudio();
+              if (!focused && route) navigateToTab(route.key);
+            }}
             style={styles.tab}
           >
-            <Icon color={focused ? colors.turquoise : colors.textFaint} />
+            <Icon color={focused ? colors.pink : colors.textFaint} />
             <Text style={[styles.label, focused && styles.labelActive]} allowFontScaling>
               {label}
             </Text>
+            {focused && <View style={styles.activeDash} />}
           </Pressable>
         );
       })}
@@ -97,8 +85,9 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }} tabBar={(props) => <TabBar {...(props as unknown as TabBarProps)} />}>
       <Tabs.Screen name="index" options={{ title: 'בית' }} />
-      <Tabs.Screen name="progress" options={{ title: 'ההתקדמות שלי' }} />
-      <Tabs.Screen name="settings" options={{ title: 'הגדרות' }} />
+      <Tabs.Screen name="achievements" options={{ title: 'הישגים' }} />
+      <Tabs.Screen name="profile" options={{ title: 'הפרופיל' }} />
+      <Tabs.Screen name="more" options={{ title: 'עוד' }} />
     </Tabs>
   );
 }
@@ -107,11 +96,10 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row-reverse',
     alignItems: 'flex-end',
-    justifyContent: 'space-around',
-    backgroundColor: colors.white,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
-    paddingTop: spacing(1),
+    backgroundColor: colors.creamCard,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingTop: spacing(1.25),
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
@@ -119,23 +107,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     gap: 3,
-    paddingVertical: spacing(0.5),
-  },
-  centerWrap: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 3,
-    marginTop: -spacing(3),
-  },
-  centerBtn: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    backgroundColor: colors.lotus,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: colors.white,
+    paddingBottom: spacing(0.5),
   },
   label: {
     ...typography.tiny,
@@ -143,6 +115,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   labelActive: {
-    color: colors.turquoise,
+    color: colors.pink,
+  },
+  activeDash: {
+    width: 26,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: colors.pink,
+    marginTop: 1,
   },
 });

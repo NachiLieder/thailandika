@@ -13,6 +13,9 @@ export const DEFAULT_PROGRESS: UserProgress = {
   results: [],
   activeQuiz: null,
   viewedItemIds: [],
+  lastActiveDate: null,
+  streakDays: 0,
+  studySeconds: {},
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -51,6 +54,18 @@ const validateActiveQuiz = (a: any): ActiveQuiz => {
   };
 };
 
+const validateStudySeconds = (raw: any): Record<string, number> => {
+  if (!raw || typeof raw !== 'object') return {};
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    const n = Number(value);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(key) && Number.isFinite(n) && n >= 0) {
+      out[key] = Math.round(n);
+    }
+  }
+  return out;
+};
+
 export const validateProgress = (raw: unknown): UserProgress => {
   if (!raw || typeof raw !== 'object') return { ...DEFAULT_PROGRESS };
   const r = raw as any;
@@ -62,6 +77,9 @@ export const validateProgress = (raw: unknown): UserProgress => {
       : [],
     activeQuiz: validateActiveQuiz(r.activeQuiz),
     viewedItemIds: isStringArray(r.viewedItemIds) ? r.viewedItemIds : [],
+    lastActiveDate: typeof r.lastActiveDate === 'string' ? r.lastActiveDate : null,
+    streakDays: Number.isFinite(Number(r.streakDays)) ? Math.max(0, Math.round(Number(r.streakDays))) : 0,
+    studySeconds: validateStudySeconds(r.studySeconds),
   };
 };
 

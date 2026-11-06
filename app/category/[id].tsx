@@ -80,8 +80,8 @@ export default function CategoryScreen() {
               <HeText variant="heading">יחידה 1 · {category.titleHe}</HeText>
               <Pill
                 label={statusLabel}
-                bg={status === 'completed' ? colors.leafSoft : status === 'in-progress' ? colors.mangoSoft : colors.turquoiseSoft}
-                fg={status === 'completed' ? colors.leaf : status === 'in-progress' ? '#8A5F00' : colors.turquoise}
+                bg={status === 'completed' ? colors.leafSoft : status === 'in-progress' ? colors.mangoSoft : colors.lotusSoft}
+                fg={status === 'completed' ? colors.leaf : status === 'in-progress' ? '#8A5F00' : colors.pinkDeep}
               />
             </View>
             <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>

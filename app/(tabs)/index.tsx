@@ -5,63 +5,84 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { AppButton, Card, FadeIn, HeText, Logo, Pill, ProgressBar } from '../../src/components/ui';
 import { CategoryIcon } from '../../src/components/CategoryIcon';
-import { Elephant, Hibiscus, PalmLeaf, Temple, Wave } from '../../src/components/Decor';
-import { CATEGORIES, getCategory } from '../../src/data/categories';
+import { Elephant } from '../../src/components/Decor';
+import { Bloom, Lotus, ThaiFlag, TropicalScene } from '../../src/components/Scenery';
+import { homeCategories, getCategory } from '../../src/data/categories';
 import { QUESTIONS_PER_QUIZ } from '../../src/data/questions';
-import { categoryPalette, colors, radius, shadow, spacing, typography } from '../../src/theme';
+import { categoryPalette, colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
 
 const Chevron: React.FC<{ color: string }> = ({ color }) => (
-  <Svg width={18} height={18} viewBox="0 0 24 24">
-    <Path d="M15 5 L8 12 L15 19" stroke={color} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  <Svg width={15} height={15} viewBox="0 0 24 24">
+    <Path d="M15 5 L8 12 L15 19" stroke={color} strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const MenuIcon: React.FC = () => (
+  <Svg width={22} height={22} viewBox="0 0 24 24">
+    {[6, 12, 18].map((y) => (
+      <Path key={y} d={`M4 ${y} H20`} stroke={colors.white} strokeWidth={2.6} strokeLinecap="round" />
+    ))}
   </Svg>
 );
 
 export default function Home() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { progress, bestScoreFor, categoryStatus, completedLessons } = useAppState();
+  const { progress, bestScoreFor, categoryStatus, bestPoints, maxPoints } = useAppState();
 
   const active = progress.activeQuiz;
   const activeCategory = getCategory(active?.categoryId);
-  const lastResult = progress.results[progress.results.length - 1];
-  const totalPoints = progress.results.reduce((s, r) => s + r.score, 0);
-  const maxPoints = CATEGORIES.length * QUESTIONS_PER_QUIZ;
-  const bestPoints = CATEGORIES.reduce((s, c) => s + bestScoreFor(c.id), 0);
+  const stage = Math.min(6, Math.floor(bestPoints / 10) + 1);
+  const cats = homeCategories();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing(12) }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + spacing(11) }}
         showsVerticalScrollIndicator={false}
       >
-        {/* כותרת טרופית */}
-        <View style={[styles.hero, { paddingTop: insets.top + spacing(1) }]}>
-          <PalmLeaf size={160} style={{ position: 'absolute', top: -24, left: -46, opacity: 0.4 }} />
-          <Temple size={110} style={{ position: 'absolute', bottom: 24, right: -6, opacity: 0.95 }} />
-          <Hibiscus size={54} style={{ position: 'absolute', top: 24, right: 90, opacity: 0.55 }} />
-          <Hibiscus size={40} color={colors.mango} style={{ position: 'absolute', bottom: 60, left: 18, opacity: 0.6 }} />
-          <Wave width={900} height={40} style={{ position: 'absolute', bottom: -2, left: 0 }} />
-          <Logo />
+        {/* תפאורה טרופית וכותרת */}
+        <View style={styles.hero}>
+          <TropicalScene height={290} style={StyleSheet.absoluteFill as any} />
+          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(1) }]}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="עוד אפשרויות"
+              onPress={() => router.push('/(tabs)/more')}
+              style={[styles.menuBtn, shadow(2)]}
+            >
+              <MenuIcon />
+            </Pressable>
+
+            <View style={styles.logoWrap}>
+              <Lotus size={46} style={{ marginBottom: -12, zIndex: 2 }} />
+              <View style={styles.logoRow}>
+                <Logo />
+                <ThaiFlag width={34} style={styles.flag} />
+              </View>
+            </View>
+          </View>
         </View>
 
         <View style={styles.body}>
           {/* ברכה אישית */}
           <FadeIn>
-            <Card style={styles.greetCard} color="#FFF4E2">
-              <Elephant size={70} />
+            <Card style={styles.greetCard} color={colors.creamCard}>
               <View style={{ flex: 1 }}>
-                <HeText variant="title">שלום, {progress.userName || 'חברה'}! 🌺</HeText>
+                <HeText variant="title">שלום {progress.userName || 'חברה'}! ❤️</HeText>
                 <HeText variant="body" style={{ color: colors.textSoft }}>
-                  לאן נטייל ונלמד היום?
+                  איזה כיף שאת כאן!
                 </HeText>
               </View>
+              <Elephant size={66} />
+              <Bloom size={24} color={colors.lotus} style={{ position: 'absolute', top: 6, right: 8, opacity: 0.45 }} />
             </Card>
           </FadeIn>
 
           {/* ממשיכים ללמוד */}
           {active && activeCategory && (
-            <FadeIn delay={80}>
+            <FadeIn delay={70}>
               <Card style={{ borderWidth: 2, borderColor: colors.mango }}>
                 <Pill label="שיעור בתהליך" bg={colors.mangoSoft} fg="#8A5F00" />
                 <HeText variant="heading" style={{ marginTop: spacing(1) }}>
@@ -81,14 +102,14 @@ export default function Home() {
             </FadeIn>
           )}
 
-          {/* שש הקטגוריות */}
+          {/* רשת שש הקטגוריות – שתי עמודות */}
           <View style={styles.grid}>
-            {CATEGORIES.map((cat, i) => {
+            {cats.map((cat, i) => {
               const palette = categoryPalette[cat.colorKey];
               const status = categoryStatus(cat.id);
               const best = bestScoreFor(cat.id);
               return (
-                <FadeIn key={cat.id} delay={120 + i * 60} style={styles.gridItem}>
+                <FadeIn key={cat.id} delay={100 + i * 55} style={styles.gridCell}>
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={`${cat.titleHe}. ${cat.descriptionHe}`}
@@ -96,74 +117,67 @@ export default function Home() {
                     style={({ pressed }) => [
                       styles.catCard,
                       shadow(1),
-                      { backgroundColor: palette.bg },
-                      pressed && { opacity: 0.85, transform: [{ scale: 0.985 }] },
+                      { backgroundColor: palette.bg, borderColor: palette.ring },
+                      pressed && { opacity: 0.86, transform: [{ scale: 0.98 }] },
                     ]}
                   >
                     <View style={styles.catTop}>
-                      <CategoryIcon name={cat.icon} size={52} />
-                      <View style={{ flex: 1 }}>
-                        <HeText variant="heading" numberOfLines={1}>
-                          {cat.titleHe}
-                        </HeText>
-                        <HeText variant="small" style={{ color: colors.textSoft }} numberOfLines={1}>
-                          {cat.descriptionHe}
-                        </HeText>
-                      </View>
+                      <CategoryIcon name={cat.icon} size={38} />
+                      {status === 'completed' && (
+                        <View style={[styles.doneDot, { backgroundColor: colors.leaf }]}>
+                          <HeText variant="tiny" style={{ color: colors.white, textAlign: 'center' }}>
+                            ✓
+                          </HeText>
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.catTitleRow}>
                       <View style={[styles.chev, { backgroundColor: palette.accent }]}>
                         <Chevron color={colors.white} />
                       </View>
-                    </View>
-
-                    <View style={styles.catBottom}>
-                      <Pill
-                        label={status === 'completed' ? '✓ הושלם' : status === 'in-progress' ? 'בתהליך' : 'חדש'}
-                        bg={status === 'completed' ? colors.leafSoft : colors.white}
-                        fg={status === 'completed' ? colors.leaf : colors.textSoft}
-                      />
-                      <View style={{ flex: 1 }}>
-                        <ProgressBar
-                          value={best}
-                          total={QUESTIONS_PER_QUIZ}
-                          color={palette.accent}
-                          trackColor={colors.white}
-                          height={9}
-                        />
-                      </View>
-                      <HeText variant="tiny" style={{ color: colors.textSoft }}>
-                        {best}/{QUESTIONS_PER_QUIZ}
+                      <HeText variant="heading" numberOfLines={1} style={{ flex: 1, fontSize: 16 }}>
+                        {cat.titleHe}
                       </HeText>
                     </View>
+
+                    <HeText variant="small" style={{ color: colors.textSoft }} numberOfLines={1}>
+                      {cat.descriptionHe}
+                    </HeText>
+
+                    <ProgressBar
+                      value={best}
+                      total={QUESTIONS_PER_QUIZ}
+                      color={palette.accent}
+                      trackColor={colors.white}
+                      height={7}
+                    />
                   </Pressable>
                 </FadeIn>
               );
             })}
           </View>
 
-          {/* ההתקדמות שלי */}
-          <FadeIn delay={520}>
-            <Card color="#FFF4E2">
-              <View style={styles.progressHeader}>
-                <HeText variant="heading">ההתקדמות שלי</HeText>
-                <Pill
-                  label={`${completedLessons} מתוך ${CATEGORIES.length} שיעורים`}
-                  bg={colors.lotusSoft}
-                  fg="#A63C6B"
-                />
+          {/* ההתקדמות שלך */}
+          <FadeIn delay={440}>
+            <Card color={colors.creamCard} style={styles.progressCard}>
+              <View style={styles.trophyBubble}>
+                <HeText style={{ fontSize: 26, textAlign: 'center' }}>🏆</HeText>
               </View>
-              <ProgressBar value={bestPoints} total={maxPoints} color={colors.lotus} height={14} />
-              <HeText variant="small" style={{ color: colors.textSoft, marginTop: spacing(1) }}>
-                {bestPoints} מתוך {maxPoints} נקודות
-                {lastResult
-                  ? ` · ציון אחרון: ${lastResult.score}/${lastResult.total} ב"${getCategory(lastResult.categoryId)?.titleHe}"`
-                  : ' · עוד לא סיימת חידון'}
-              </HeText>
-              <AppButton
-                title="למסך ההתקדמות המלא"
-                variant="secondary"
-                style={{ marginTop: spacing(1.5) }}
-                onPress={() => router.push('/(tabs)/progress')}
-              />
+              <View style={{ flex: 1, gap: spacing(0.5) }}>
+                <HeText variant="heading" style={{ fontSize: 16 }}>
+                  ההתקדמות שלך
+                </HeText>
+                <ProgressBar value={bestPoints} total={maxPoints} color={colors.pink} height={11} />
+                <HeText variant="tiny" style={{ color: colors.textSoft }}>
+                  {bestPoints}/{maxPoints} נקודות
+                </HeText>
+              </View>
+              <View style={styles.stageBadge}>
+                <HeText variant="tiny" style={{ color: colors.white, textAlign: 'center' }}>
+                  ⭐ שלב {stage}
+                </HeText>
+              </View>
             </Card>
           </FadeIn>
         </View>
@@ -173,54 +187,71 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    backgroundColor: colors.turquoiseLight,
-    paddingBottom: spacing(5),
-    overflow: 'hidden',
+  hero: { height: 290, overflow: 'hidden' },
+  heroContent: { flex: 1, paddingHorizontal: spacing(2) },
+  menuBtn: {
+    position: 'absolute',
+    top: spacing(1),
+    left: spacing(2),
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.pink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 3,
   },
+  logoWrap: { alignItems: 'center', marginTop: spacing(1) },
+  logoRow: { flexDirection: 'row-reverse', alignItems: 'center' },
+  flag: { marginRight: -8, marginBottom: 22 },
   body: {
     paddingHorizontal: spacing(2),
-    marginTop: -spacing(3),
-    gap: spacing(2),
+    marginTop: -spacing(7),
+    gap: spacing(1.5),
   },
   greetCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: spacing(1.5),
+    gap: spacing(1.25),
+    borderWidth: 2,
+    borderColor: colors.lotusMid,
   },
   grid: {
-    gap: spacing(1.5),
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    gap: spacing(1.25),
   },
-  gridItem: {
-    width: '100%',
-  },
+  gridCell: { width: '47.8%', flexGrow: 1 },
   catCard: {
     borderRadius: radius.lg,
-    padding: spacing(1.75),
-    gap: spacing(1.25),
+    borderWidth: 2,
+    padding: spacing(1.25),
+    gap: spacing(0.65),
+    minHeight: 132,
   },
-  catTop: {
+  catTop: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  catTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(0.75) },
+  chev: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  doneDot: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  progressCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: spacing(1.25),
+    borderWidth: 2,
+    borderColor: colors.lotusMid,
   },
-  catBottom: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: spacing(1),
-  },
-  chev: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+  trophyBubble: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.mangoSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressHeader: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing(1.25),
-    gap: spacing(1),
+  stageBadge: {
+    backgroundColor: colors.pink,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing(1.1),
+    paddingVertical: spacing(0.6),
   },
 });

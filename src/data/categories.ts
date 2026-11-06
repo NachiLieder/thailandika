@@ -14,7 +14,7 @@ export const CATEGORIES: LearningCategory[] = [
   {
     id: 'conversations',
     titleHe: 'שיחות יומיומיות',
-    descriptionHe: 'לדבר כמו מקומית',
+    descriptionHe: 'לדבר בביטחון',
     longDescriptionHe:
       'ברכות, היכרות ובקשות קטנות – כל מה שצריך כדי לפתוח שיחה ולהרגיש בנוח.',
     icon: 'chat',
@@ -24,7 +24,7 @@ export const CATEGORIES: LearningCategory[] = [
   {
     id: 'food',
     titleHe: 'אוכל ומסעדות',
-    descriptionHe: 'להזמין ולהתענג',
+    descriptionHe: 'להזמין אוכל',
     longDescriptionHe:
       'תפריט, מנות בסיס, בקשה ללא חריף ובקשת החשבון – השיעור הכי טעים כאן.',
     icon: 'food',
@@ -34,7 +34,7 @@ export const CATEGORIES: LearningCategory[] = [
   {
     id: 'travel',
     titleHe: 'טיולים והתמצאות',
-    descriptionHe: 'להסתדר בתאילנד',
+    descriptionHe: 'להסתדר בטיול',
     longDescriptionHe:
       'מלון, שדה תעופה, שירותים וכיווני דרך – כדי להגיע לכל מקום בלי להילחץ.',
     icon: 'temple',
@@ -54,7 +54,7 @@ export const CATEGORIES: LearningCategory[] = [
   {
     id: 'games',
     titleHe: 'משחקי ידע',
-    descriptionHe: 'ללמוד בכיף ובמשחק',
+    descriptionHe: 'ללמוד בכיף',
     longDescriptionHe:
       'חידון מעורב שמשלב הקשבה, זיהוי מילים וסיטואציות מכל מה שלמדת עד כה.',
     icon: 'game',
@@ -62,6 +62,12 @@ export const CATEGORIES: LearningCategory[] = [
     lessonIds: ['games-1'],
   },
 ];
+
+/** סדר הצגת הכרטיסים במסך הבית, לפי המוקאפ (קריאה מימין לשמאל) */
+export const HOME_ORDER = ['words', 'conversations', 'travel', 'food', 'games', 'numbers'];
+
+export const homeCategories = (): LearningCategory[] =>
+  HOME_ORDER.map((id) => CATEGORIES.find((c) => c.id === id)).filter(Boolean) as LearningCategory[];
 
 export const getCategory = (id?: string | null): LearningCategory | undefined =>
   CATEGORIES.find((c) => c.id === id);

@@ -93,7 +93,7 @@ export const AudioButton: React.FC<Props> = ({ thai, itemId, label = 'השמעה
 
 const styles = StyleSheet.create({
   btn: {
-    minHeight: 54,
+    minHeight: 50,
     borderRadius: radius.pill,
     backgroundColor: colors.turquoise,
     paddingHorizontal: spacing(3),

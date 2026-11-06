@@ -1,35 +1,60 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
-import { AppButton, Card, FadeIn, HeText, Pill, ProgressBar, ThaiLabel } from '../../src/components/ui';
-import { ScreenHeader } from '../../src/components/ScreenHeader';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { AppButton, Card, FadeIn, HeText, ProgressBar, ThaiLabel } from '../../src/components/ui';
 import { AudioButton } from '../../src/components/AudioButton';
-import { PalmLeaf } from '../../src/components/Decor';
+import { CategoryIcon } from '../../src/components/CategoryIcon';
+import { SceneCard } from '../../src/components/Scenery';
 import { getCategory } from '../../src/data/categories';
 import { getQuestionsByCategory, QUESTIONS_PER_QUIZ } from '../../src/data/questions';
 import { QuizOption } from '../../src/data/types';
-import { categoryPalette, colors, radius, shadow, spacing, typography } from '../../src/theme';
+import { colors, radius, shadow, spacing } from '../../src/theme';
 import { useAppState } from '../../src/state/AppStateContext';
+import { useStudyTimer } from '../../src/state/useStudyTimer';
 import { shuffle } from '../../src/utils/shuffle';
 import { stopAllAudio } from '../../src/audio/useSpeech';
 
 type Phase = 'question' | 'correct-feedback' | 'retry';
 
-const PRAISE = ['יופי של עבודה!', 'מדויק לגמרי.', 'ככה זה נשמע נכון.', 'את זוכרת מצוין.'];
+const PRAISE = ['עבודה מעולה! 🌸', 'מדויק לגמרי! 🌺', 'ככה זה נשמע נכון! 🐘', 'את זוכרת מצוין! ⭐'];
+
+const BackArrow: React.FC = () => (
+  <Svg width={21} height={21} viewBox="0 0 24 24">
+    <Path d="M15 5 L8 12 L15 19" stroke={colors.white} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const CheckCircle: React.FC<{ size?: number; bg?: string; fg?: string }> = ({
+  size = 26,
+  bg = colors.white,
+  fg = colors.pink,
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="11" fill={bg} />
+    <Path d="M7 12.4 l3.2 3.2 6.2 -6.6" stroke={fg} strokeWidth={2.8} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const CrossCircle: React.FC<{ size?: number }> = ({ size = 26 }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Circle cx="12" cy="12" r="11" fill={colors.error} />
+    <Path d="M8.4 8.4 l7.2 7.2 M15.6 8.4 l-7.2 7.2" stroke={colors.white} strokeWidth={2.6} strokeLinecap="round" />
+  </Svg>
+);
 
 export default function QuizScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { progress, saveActiveQuiz, completeQuiz, settings } = useAppState();
+  useStudyTimer();
 
   const category = getCategory(id);
   const questions = useMemo(() => (category ? getQuestionsByCategory(category.id) : []), [category]);
 
-  // המשך מחידון שנשמר, אם יש כזה לקטגוריה הנוכחית
   const resume = useRef(
     progress.activeQuiz && progress.activeQuiz.categoryId === id ? progress.activeQuiz : null,
   ).current;
@@ -48,7 +73,6 @@ export default function QuizScreen() {
 
   const question = questions[index];
 
-  // סדר אפשרויות מעורבב, קבוע לכל הפעלה של החידון
   const shuffledOptions = useMemo(() => {
     const map: Record<string, QuizOption[]> = {};
     questions.forEach((q) => {
@@ -57,7 +81,6 @@ export default function QuizScreen() {
     return map;
   }, [questions]);
 
-  // שמירת מצב החידון כדי לאפשר המשך אחרי יציאה
   useEffect(() => {
     if (!category || finishing.current) return;
     if (index >= questions.length) return;
@@ -84,29 +107,27 @@ export default function QuizScreen() {
 
   const advance = useCallback(
     (finalScore: number) => {
+      if (timer.current) clearTimeout(timer.current);
       locked.current = false;
       setChosenId(null);
       setWrongIds([]);
       setPhase('question');
-      if (index + 1 >= questions.length) {
-        void goToResult(finalScore);
-      } else {
-        setIndex(index + 1);
-      }
+      if (index + 1 >= questions.length) void goToResult(finalScore);
+      else setIndex(index + 1);
     },
     [index, questions.length, goToResult],
   );
 
   const onSelect = useCallback(
     (optionId: string) => {
-      if (!question || locked.current) return; // מונע לחיצה כפולה ורישום כפול
+      if (!question || locked.current) return;
       if (phase === 'correct-feedback') return;
 
       const isCorrect = optionId === question.correctOptionId;
       setChosenId(optionId);
 
       if (isCorrect) {
-        locked.current = true; // נעילה עד המעבר האוטומטי
+        locked.current = true;
         let nextScore = score;
         if (!awarded.current.has(question.id)) {
           awarded.current.add(question.id);
@@ -117,7 +138,8 @@ export default function QuizScreen() {
         if (Platform.OS !== 'web' && settings.soundEnabled) {
           void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
         }
-        timer.current = setTimeout(() => advance(nextScore), 1100);
+        // מעבר אוטומטי; הכפתור "לשאלה הבאה" רק מקצר את ההמתנה
+        timer.current = setTimeout(() => advance(nextScore), 1200);
       } else {
         setWrongIds((prev) => (prev.includes(optionId) ? prev : [...prev, optionId]));
         setPhase('retry');
@@ -131,17 +153,14 @@ export default function QuizScreen() {
 
   if (!category || questions.length === 0) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.cream }}>
-        <ScreenHeader title="אין שאלות ליחידה הזו" />
-        <View style={{ padding: spacing(2) }}>
-          <Card>
-            <HeText variant="heading">לא מצאנו חידון לקטגוריה הזו</HeText>
-            <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
-              אפשר לחזור לבית ולבחור קטגוריה אחרת.
-            </HeText>
-            <AppButton title="חזרה לבית" style={{ marginTop: spacing(2) }} onPress={() => router.replace('/(tabs)')} />
-          </Card>
-        </View>
+      <View style={{ flex: 1, backgroundColor: colors.cream, padding: spacing(2), justifyContent: 'center' }}>
+        <Card>
+          <HeText variant="heading">לא מצאנו חידון לקטגוריה הזו</HeText>
+          <HeText variant="body" style={{ color: colors.textSoft, marginTop: spacing(0.5) }}>
+            אפשר לחזור לבית ולבחור קטגוריה אחרת.
+          </HeText>
+          <AppButton title="חזרה לבית" style={{ marginTop: spacing(2) }} onPress={() => router.replace('/(tabs)')} />
+        </Card>
       </View>
     );
   }
@@ -154,25 +173,40 @@ export default function QuizScreen() {
     );
   }
 
-  const palette = categoryPalette[category.colorKey];
   const options = shuffledOptions[question.id] ?? question.options;
-  const showAudio = !!question.promptThai;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.cream }}>
-      <View style={[styles.hero, { backgroundColor: palette.bg }]}>
-        <PalmLeaf size={130} style={{ position: 'absolute', top: -24, left: -44, opacity: 0.25 }} />
-        <ScreenHeader
-          title={category.titleHe}
-          subtitle={`ההתקדמות שלך נשמרת – אפשר לצאת ולחזור`}
-          right={<Pill label={`${score} נק'`} bg={colors.white} fg={colors.leaf} />}
-        />
-        <View style={{ paddingHorizontal: spacing(2), paddingBottom: spacing(1.5), gap: spacing(0.75) }}>
-          <HeText variant="small" style={{ color: colors.text }}>
-            שאלה {index + 1} מתוך {QUESTIONS_PER_QUIZ}
-          </HeText>
-          <ProgressBar value={index} total={QUESTIONS_PER_QUIZ} color={palette.accent} trackColor={colors.white} />
+      {/* כותרת */}
+      <View style={[styles.header, { paddingTop: insets.top + spacing(1) }]}>
+        <View style={[styles.catBadge, shadow(1)]}>
+          <CategoryIcon name={category.icon} size={30} />
         </View>
+
+        <HeText variant="title" style={{ flex: 1, textAlign: 'center', color: colors.pinkDeep }} numberOfLines={1}>
+          {category.titleHe}
+        </HeText>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="חזרה"
+          onPress={() => {
+            stopAllAudio();
+            if (router.canGoBack()) router.back();
+            else router.replace('/(tabs)');
+          }}
+          style={[styles.backBtn, shadow(2)]}
+          hitSlop={10}
+        >
+          <BackArrow />
+        </Pressable>
+      </View>
+
+      <View style={styles.progressWrap}>
+        <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+          📖 שאלה {index + 1} מתוך {QUESTIONS_PER_QUIZ}
+        </HeText>
+        <ProgressBar value={index} total={QUESTIONS_PER_QUIZ} color={colors.pink} height={10} />
       </View>
 
       <ScrollView
@@ -180,8 +214,16 @@ export default function QuizScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <FadeIn key={question.id}>
-          <Card style={{ gap: spacing(1.5) }}>
-            <HeText variant="heading">{question.promptHe}</HeText>
+          <SceneCard height={146} style={shadow(1)}>
+            <CategoryIcon name={category.icon} size={54} />
+          </SceneCard>
+        </FadeIn>
+
+        <FadeIn key={`${question.id}-q`} delay={60}>
+          <View style={{ gap: spacing(1) }}>
+            <HeText variant="title" style={{ textAlign: 'center' }}>
+              {question.promptHe}
+            </HeText>
 
             {!!question.promptThai && (
               <View style={styles.thaiBox}>
@@ -189,115 +231,92 @@ export default function QuizScreen() {
               </View>
             )}
 
-            {showAudio && (
+            {!!question.promptThai && (
               <AudioButton
-                thai={question.promptThai as string}
+                thai={question.promptThai}
                 itemId={question.itemId}
                 label={question.kind === 'listening' ? 'להשמעה חוזרת' : 'השמעה'}
                 compact
               />
             )}
-          </Card>
+
+            <HeText variant="small" style={{ color: colors.textSoft, textAlign: 'center' }}>
+              בחרי את התשובה הנכונה:
+            </HeText>
+          </View>
         </FadeIn>
 
         <View style={{ gap: spacing(1) }}>
           {options.map((opt) => {
-            const isCorrectOpt = opt.id === question.correctOptionId;
             const isWrong = wrongIds.includes(opt.id);
             const isChosenCorrect = phase === 'correct-feedback' && chosenId === opt.id;
-
-            const bg = isChosenCorrect
-              ? colors.leafSoft
-              : isWrong
-                ? colors.errorSoft
-                : colors.white;
-            const border = isChosenCorrect ? colors.leaf : isWrong ? colors.error : colors.border;
 
             return (
               <Pressable
                 key={opt.id}
                 accessibilityRole="button"
                 accessibilityLabel={opt.labelHe || opt.labelThai}
-                accessibilityState={{
-                  disabled: phase === 'correct-feedback',
-                  selected: chosenId === opt.id,
-                }}
+                accessibilityState={{ disabled: phase === 'correct-feedback', selected: chosenId === opt.id }}
                 disabled={phase === 'correct-feedback'}
                 onPress={() => onSelect(opt.id)}
                 style={({ pressed }) => [
                   styles.option,
                   shadow(1),
-                  { backgroundColor: bg, borderColor: border },
-                  pressed && { opacity: 0.9 },
+                  isChosenCorrect && { backgroundColor: colors.pink, borderColor: colors.pink },
+                  isWrong && { backgroundColor: colors.errorSoft, borderColor: colors.error },
+                  pressed && !isChosenCorrect && { opacity: 0.9 },
                 ]}
               >
                 <View style={styles.optionRow}>
-                  <View
-                    style={[
-                      styles.marker,
-                      {
-                        backgroundColor: isChosenCorrect ? colors.leaf : isWrong ? colors.error : colors.turquoiseSoft,
-                      },
-                    ]}
-                  >
-                    <HeText
-                      variant="small"
-                      style={{
-                        color: isChosenCorrect || isWrong ? colors.white : colors.turquoise,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {isChosenCorrect ? '✓' : isWrong ? '✕' : '•'}
-                    </HeText>
-                  </View>
-
                   <View style={{ flex: 1 }}>
                     {opt.labelThai ? (
-                      <ThaiLabel size="small" style={{ textAlign: 'right' }}>
+                      <ThaiLabel
+                        size="small"
+                        color={isChosenCorrect ? colors.white : colors.text}
+                        style={{ textAlign: 'center' }}
+                      >
                         {opt.labelThai}
                       </ThaiLabel>
                     ) : (
-                      <HeText variant="body" style={{ fontWeight: '700' }}>
+                      <HeText
+                        variant="body"
+                        style={{
+                          textAlign: 'center',
+                          fontWeight: '800',
+                          color: isChosenCorrect ? colors.white : isWrong ? colors.error : colors.text,
+                        }}
+                      >
                         {opt.labelHe}
                       </HeText>
                     )}
-                    {isWrong && (
-                      <HeText variant="tiny" style={{ color: colors.error }}>
-                        לא זו – אפשר לנסות שוב
-                      </HeText>
-                    )}
-                    {isChosenCorrect && (
-                      <HeText variant="tiny" style={{ color: colors.leaf }}>
-                        תשובה נכונה
-                      </HeText>
-                    )}
                   </View>
-
-                  {isCorrectOpt && phase === 'correct-feedback' && (
-                    <Pill label="נכון" bg={colors.leaf} fg={colors.white} />
-                  )}
+                  {isChosenCorrect && <CheckCircle />}
+                  {isWrong && <CrossCircle />}
                 </View>
               </Pressable>
             );
           })}
         </View>
 
-        {/* משוב */}
         {phase === 'correct-feedback' && (
           <FadeIn>
-            <View style={[styles.feedback, { backgroundColor: colors.leafSoft, borderColor: colors.leaf }]}>
-              <HeText variant="title" style={{ color: colors.leaf }}>
-                ✓ בחירה נכונה!
-              </HeText>
-              <HeText variant="heading" style={{ color: colors.leaf }}>
-                עבודה מעולה
-              </HeText>
-              <HeText variant="small" style={{ color: '#2F6B51' }}>
-                {praise} {question.explanationHe ?? ''}
-              </HeText>
-              <HeText variant="tiny" style={{ color: '#2F6B51' }}>
-                עוברים לשאלה הבאה...
-              </HeText>
+            <View style={[styles.feedback, { backgroundColor: colors.leafSoft, borderColor: colors.leafMid }]}>
+              <View style={styles.feedbackRow}>
+                <CheckCircle size={34} bg={colors.leaf} fg={colors.white} />
+                <View style={{ flex: 1 }}>
+                  <HeText variant="heading" style={{ color: colors.leaf }}>
+                    בחירה נכונה!
+                  </HeText>
+                  <HeText variant="small" style={{ color: '#2F6B51' }}>
+                    {praise}
+                  </HeText>
+                </View>
+              </View>
+              {!!question.explanationHe && (
+                <HeText variant="tiny" style={{ color: '#2F6B51' }}>
+                  {question.explanationHe}
+                </HeText>
+              )}
             </View>
           </FadeIn>
         )}
@@ -305,19 +324,29 @@ export default function QuizScreen() {
         {phase === 'retry' && (
           <FadeIn>
             <View style={[styles.feedback, { backgroundColor: colors.errorSoft, borderColor: colors.error }]}>
-              <HeText variant="heading" style={{ color: colors.error }}>
-                ✕ לא בדיוק — נסי שוב!
-              </HeText>
-              <HeText variant="small" style={{ color: '#8E3A36' }}>
-                {question.explanationHe
-                  ? `רמז: ${question.explanationHe}`
-                  : 'אפשר להשמיע שוב את הביטוי ולבחור תשובה אחרת.'}
-              </HeText>
+              <View style={styles.feedbackRow}>
+                <CrossCircle size={34} />
+                <View style={{ flex: 1 }}>
+                  <HeText variant="heading" style={{ color: colors.error }}>
+                    לא בדיוק — נסי שוב!
+                  </HeText>
+                  <HeText variant="small" style={{ color: '#8E3A36' }}>
+                    {question.explanationHe ? `רמז: ${question.explanationHe}` : 'אפשר להשמיע שוב ולבחור תשובה אחרת.'}
+                  </HeText>
+                </View>
+              </View>
               <HeText variant="tiny" style={{ color: '#8E3A36' }}>
                 טעות לא מורידה נקודות. נשארים באותה שאלה עד שמוצאים את התשובה הנכונה.
               </HeText>
             </View>
           </FadeIn>
+        )}
+
+        {phase === 'correct-feedback' && (
+          <AppButton
+            title={index + 1 >= questions.length ? 'לסיכום השיעור ←' : 'לשאלה הבאה ←'}
+            onPress={() => advance(score)}
+          />
         )}
       </ScrollView>
     </View>
@@ -325,33 +354,55 @@ export default function QuizScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { overflow: 'hidden' },
-  body: { paddingHorizontal: spacing(2), paddingTop: spacing(2), gap: spacing(2) },
-  thaiBox: {
-    backgroundColor: colors.turquoiseSoft,
-    borderRadius: radius.lg,
-    paddingVertical: spacing(1.5),
-    paddingHorizontal: spacing(1),
+  header: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: spacing(1),
+    paddingHorizontal: spacing(2),
+    paddingBottom: spacing(1),
   },
-  option: {
-    borderRadius: radius.md,
-    borderWidth: 2,
-    padding: spacing(1.5),
-    minHeight: 64,
-    justifyContent: 'center',
-  },
-  optionRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1.25) },
-  marker: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  backBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.pink,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  catBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressWrap: { paddingHorizontal: spacing(2), paddingBottom: spacing(1), gap: spacing(0.6) },
+  body: { paddingHorizontal: spacing(2), paddingTop: spacing(1), gap: spacing(1.75) },
+  thaiBox: {
+    backgroundColor: colors.turquoiseSoft,
+    borderRadius: radius.lg,
+    paddingVertical: spacing(1.25),
+    paddingHorizontal: spacing(1),
+    borderWidth: 2,
+    borderColor: colors.turquoiseLight,
+  },
+  option: {
+    borderRadius: radius.pill,
+    borderWidth: 2,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    paddingVertical: spacing(1.4),
+    paddingHorizontal: spacing(2),
+    minHeight: 58,
+    justifyContent: 'center',
+  },
+  optionRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1) },
   feedback: {
     borderRadius: radius.lg,
     borderWidth: 2,
-    padding: spacing(2),
-    gap: spacing(0.5),
+    padding: spacing(1.5),
+    gap: spacing(0.75),
   },
+  feedbackRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: spacing(1) },
 });

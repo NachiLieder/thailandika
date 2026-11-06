@@ -10,7 +10,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppButton, FadeIn, HeText, Logo } from '../src/components/ui';
-import { Elephant, Hibiscus, PalmLeaf, Temple, Wave } from '../src/components/Decor';
+import { Elephant } from '../src/components/Decor';
+import { Lotus, ThaiFlag, TropicalScene } from '../src/components/Scenery';
 import { colors, he, radius, shadow, spacing, typography } from '../src/theme';
 import { useAppState } from '../src/state/AppStateContext';
 
@@ -37,12 +38,13 @@ export default function Onboarding() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.hero}>
-        <PalmLeaf size={170} style={{ position: 'absolute', top: -30, left: -50, opacity: 0.45 }} />
-        <Hibiscus size={70} style={{ position: 'absolute', top: 40, right: 16, opacity: 0.6 }} />
-        <Temple size={120} style={{ position: 'absolute', bottom: 10, right: -10, opacity: 0.9 }} />
-        <Wave width={900} height={44} style={{ position: 'absolute', bottom: -2, left: 0 }} />
+        <TropicalScene height={250} style={StyleSheet.absoluteFill as any} />
         <View style={styles.heroLogo}>
-          <Logo />
+          <Lotus size={44} style={{ marginBottom: -12, zIndex: 2 }} />
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
+            <Logo />
+            <ThaiFlag width={32} style={{ marginRight: -8, marginBottom: 22 }} />
+          </View>
         </View>
       </View>
 
@@ -104,14 +106,13 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   heroLogo: {
     position: 'absolute',
-    bottom: 34,
+    bottom: 22,
     left: 0,
     right: 0,
     alignItems: 'center',
   },
   hero: {
     height: 250,
-    backgroundColor: colors.turquoiseLight,
     overflow: 'hidden',
   },
   content: {
