@@ -9,6 +9,8 @@ export const images = {
   phiPhiBay: require('../../assets/thailand/phi-phi-bay.jpg'),
   /** חוף טרופי – חול לבן, דקלים ושמיים כחולים. רקע מסך הסיום */
   tropicalBeach: require('../../assets/thailand/tropical-beach.jpg'),
+  /** מקדש תאילנדי ברצועת גיבור – הגג המוזהב והצ'די במרכז */
+  heroTemple: require('../../assets/thailand/hero-temple.jpg'),
   /** מקדש תאילנדי – גגות זהב ואדריכלות מסורתית. כותרות שיעור וחידון */
   thaiTemple: require('../../assets/thailand/thai-temple.jpg'),
   /** זר טרופי שקוף – היביסקוס, פרנג׳יפני ועלי דקל */

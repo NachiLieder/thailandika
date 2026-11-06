@@ -55,9 +55,11 @@ export default function AchievementsScreen() {
             <View style={[styles.trophyRing, shadow(2)]}>
               <TrophyCup size={74} />
             </View>
-            <HeText variant="display" style={{ color: colors.lotusDark, textAlign: 'center' }}>
-              ההישגים שלי
-            </HeText>
+            <View style={[styles.titlePlate, shadow(1)]}>
+              <HeText variant="display" style={{ color: colors.lotusDark, textAlign: 'center' }}>
+                ההישגים שלי
+              </HeText>
+            </View>
             <View style={styles.chip}>
               <HeText variant="small" style={{ textAlign: 'center' }}>
                 🏆 {unlocked} מתוך {badges.length} הישגים נפתחו
@@ -137,6 +139,12 @@ export default function AchievementsScreen() {
 }
 
 const styles = StyleSheet.create({
+  titlePlate: {
+    backgroundColor: 'rgba(255, 252, 247, 0.92)',
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing(2.5),
+    paddingVertical: spacing(0.3),
+  },
   hero: { height: 236, overflow: 'hidden' },
   heroContent: { flex: 1, paddingHorizontal: spacing(2), alignItems: 'center' },
   trophyRing: {

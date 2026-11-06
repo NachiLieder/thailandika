@@ -1,8 +1,23 @@
 import React from 'react';
-import { View, ImageBackground, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
+import { View, Image, StyleSheet, ViewStyle, ImageStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, images, radius, shadow, ImageKey } from '../theme';
 import type { ImageSourcePropType } from 'react-native';
+
+/**
+ * מילוי מוחלט מפורש.
+ * ב-RN Web הקיצור StyleSheet.absoluteFill אינו מקבע את מידות התמונה,
+ * והיא נפרשת לגודלה הטבעי ונחתכת – לכן נקבעים כאן גם width וגם height.
+ */
+const fill: ImageStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  width: '100%',
+  height: '100%',
+};
 
 /**
  * אזור גיבור עם תצלום אמיתי מתאילנד.
@@ -25,28 +40,23 @@ export const PhotoHero: React.FC<{
       style,
     ]}
   >
-    <ImageBackground
-      source={images[image] as ImageSourcePropType}
-      resizeMode="cover"
+    <Image source={images[image] as ImageSourcePropType} resizeMode="cover" style={fill} />
+    {/* ציפוי שנסגר לשמנת בתחתית, כדי שהגיבור יתמזג עם רקע המסך */}
+    <LinearGradient
+      colors={
+        tone === 'cream'
+          ? [
+              `rgba(255, 245, 232, ${Math.min(1, dim)})`,
+              `rgba(255, 245, 232, ${Math.min(1, dim + 0.08)})`,
+              colors.cream,
+            ]
+          : [`rgba(20, 75, 90, ${dim * 0.2})`, `rgba(20, 75, 90, ${dim})`, `rgba(20, 75, 90, ${dim})`]
+      }
+      locations={[0, 0.7, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
       style={StyleSheet.absoluteFill as ViewStyle}
-    >
-      <LinearGradient
-        // ציפוי שמנת אחיד, שנסגר לשמנת מלאה בתחתית כדי להתמזג עם רקע המסך
-        colors={
-          tone === 'cream'
-            ? [
-                `rgba(255, 245, 232, ${Math.min(1, dim)})`,
-                `rgba(255, 245, 232, ${Math.min(1, dim + 0.08)})`,
-                colors.cream,
-              ]
-            : [`rgba(20, 75, 90, ${dim * 0.2})`, `rgba(20, 75, 90, ${dim})`, `rgba(20, 75, 90, ${dim})`]
-        }
-        locations={tone === 'cream' ? [0, 0.7, 1] : [0, 0.7, 1]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={StyleSheet.absoluteFill as ViewStyle}
-      />
-    </ImageBackground>
+    />
     {children}
   </View>
 );
@@ -60,11 +70,7 @@ export const PhotoBackdrop: React.FC<{
   children?: React.ReactNode;
 }> = ({ image = 'tropicalBeach', veil = 0.78, children }) => (
   <View style={{ flex: 1, backgroundColor: colors.cream }}>
-    <Image
-      source={images[image] as ImageSourcePropType}
-      resizeMode="cover"
-      style={StyleSheet.absoluteFill as ImageStyle}
-    />
+    <Image source={images[image] as ImageSourcePropType} resizeMode="cover" style={fill} />
     <LinearGradient
       colors={[`rgba(255, 245, 232, ${veil * 0.72})`, `rgba(255, 245, 232, ${veil})`, colors.cream]}
       locations={[0, 0.55, 1]}

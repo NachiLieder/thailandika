@@ -73,7 +73,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="שינוי השם"
                 onPress={() => router.push('/(tabs)/more')}
-                style={styles.nameRow}
+                style={[styles.nameRow, shadow(1)]}
               >
                 <HeText variant="display" style={{ color: colors.lotusDark }}>
                   {progress.userName || 'חברה'}
@@ -161,7 +161,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  nameRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: spacing(0.75) },
+  nameRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: spacing(0.75),
+    backgroundColor: 'rgba(255, 252, 247, 0.92)',
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing(2),
+    paddingVertical: spacing(0.4),
+  },
   taglineChip: {
     backgroundColor: 'rgba(255,255,255,0.82)',
     borderRadius: radius.pill,

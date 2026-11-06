@@ -37,14 +37,15 @@ export default function ProgressScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
-          <PhotoHero image="thaiTemple" height={230} tone="cream" dim={0.42} style={StyleSheet.absoluteFill as any} />
-          <Decoration image="palmLeaf" size={112} rotate={18} flip style={{ top: -18, left: -32 }} opacity={0.8} />
-          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(6), alignItems: 'center' }]}>
-            <HeText variant="display" style={{ color: colors.lotusDark, textAlign: 'center' }}>
-              ההתקדמות שלי
-            </HeText>
-            <View style={styles.taglineChip}>
-              <HeText variant="small" style={{ textAlign: 'center' }}>
+          <PhotoHero image="heroTemple" height={282} dim={0.26} style={StyleSheet.absoluteFill as any} />
+          <Decoration image="palmLeaf" size={112} rotate={18} flip style={{ top: -18, left: -32 }} opacity={0.85} />
+          <View style={[styles.heroContent, { paddingTop: insets.top + spacing(1) }]}>
+            {/* לוחית שמנת מתחת לכותרת – הטקסט חייב להישאר קריא מעל התצלום */}
+            <View style={[styles.titlePlate, shadow(2)]}>
+              <HeText variant="display" style={{ color: colors.lotusDark, textAlign: 'center' }}>
+                ההתקדמות שלי
+              </HeText>
+              <HeText variant="small" style={{ textAlign: 'center', color: colors.textSecondary }}>
                 📚 כל הנושאים במקום אחד
               </HeText>
             </View>
@@ -124,8 +125,17 @@ export default function ProgressScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { height: 230, overflow: 'hidden' },
-  heroContent: { flex: 1, alignItems: 'center', paddingHorizontal: spacing(2) },
+  titlePlate: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255, 252, 247, 0.93)',
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: colors.lotusMid,
+    paddingHorizontal: spacing(3),
+    paddingVertical: spacing(1),
+  },
+  hero: { height: 282, overflow: 'hidden' },
+  heroContent: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: spacing(2), paddingBottom: spacing(4) },
   avatarRing: {
     width: 96,
     height: 96,
